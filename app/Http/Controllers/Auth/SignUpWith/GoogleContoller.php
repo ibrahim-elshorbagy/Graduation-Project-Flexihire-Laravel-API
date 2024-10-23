@@ -9,6 +9,7 @@ use Laravel\Socialite\Facades\Socialite;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 
 class GoogleContoller extends Controller
 {
@@ -25,24 +26,77 @@ class GoogleContoller extends Controller
 
     public function redirectToGoogle(Request $request)
     {
+        // Validate the incoming request
+        $validateUser = Validator::make($request->all(), [
+            'role' => 'required|in:freelancer,customer',
+        ]);
+
+        if ($validateUser->fails()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Validation error',
+                'errors' => $validateUser->errors(),
+            ], 422);
+        }
+
+        // Retrieve platform and role from the request
         $platform = $request->query('platform', 'web');
+        $role = $request->input('role');
+
+        // Configure the Google driver
         $this->configureGoogleDriver($platform);
 
-        return Socialite::driver('google')->stateless()->redirect();
+        // Encode the role into the state parameter
+        $state = base64_encode(json_encode(['role' => $role]));
+
+        // Redirect to Google OAuth with the custom state
+        return Socialite::driver('google')
+            ->with(['state' => $state])
+            ->stateless()
+            ->redirect();
     }
+
+
 
     public function handleGoogleCallback(Request $request)
     {
         try {
+            // Retrieve platform from the request
             $platform = $request->query('platform', 'web');
             $this->configureGoogleDriver($platform);
 
+            // Retrieve and decode the state parameter
+            $state = $request->input('state');
+            if (!$state) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Missing state parameter.',
+                ], 400);
+            }
+
+            $stateData = json_decode(base64_decode($state), true);
+            $role = $stateData['role'] ?? null;
+
+            // Validate the role
+            $validateUser = Validator::make(['role' => $role], [
+                'role' => 'required|in:freelancer,customer',
+            ]);
+
+            if ($validateUser->fails()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Validation error',
+                    'errors' => $validateUser->errors(),
+                ], 422);
+            }
+
+            // Proceed with Socialite user retrieval
             $socialiteUser = Socialite::driver('google')->stateless()->user();
 
+            // Existing user logic...
             $existingUser = User::where('email', $socialiteUser->email)->first();
 
-
-                if ($existingUser) {
+            if ($existingUser) {
                 if (is_null($existingUser->google_id)) {
                     $existingUser->google_id = $socialiteUser->id;
                     $existingUser->save();
@@ -54,30 +108,33 @@ class GoogleContoller extends Controller
 
                 $roles = $existingUser->roles->pluck('name')->toArray();
 
-            return response()->json([
+                return response()->json([
                     'status' => true,
                     'message' => 'Login successfully.',
                     'token' => $token,
                     'roles' => $roles,
                     'user' => [
-                    'id' => $existingUser->id,
-                    'name' => $existingUser->name,
-                    'email' => $existingUser->email,
-                ]
+                        'id' => $existingUser->id,
+                        'name' => $existingUser->name,
+                        'email' => $existingUser->email,
+                    ]
                 ], 200);
-            }else {
+            } else {
+                // Create a new user with the retrieved role
                 $newUser = User::create([
                     'name' => $socialiteUser->name,
                     'email' => $socialiteUser->email,
                     'google_id' => $socialiteUser->id,
-                    'password' => Hash::make('1231@#165E!#!#@$1625essful!@$16my')
+                    'password' => Hash::make('secure_password'), // Ensure you use a secure method
                 ]);
 
                 Auth::login($newUser);
-                $newUser->assignRole('user');
+
+                // Assign the selected role to the new user
+                $newUser->assignRole($role);
                 $roles = $newUser->roles->pluck('name')->toArray();
 
-                $token = $newUser->createToken('GoogleAuthToken')->accessToken;
+                $token = $newUser->createToken('GoogleAuthToken')->plainTextToken;
 
                 return response()->json([
                     'status' => true,
@@ -85,17 +142,20 @@ class GoogleContoller extends Controller
                     'roles' => $roles,
                     'token' => $token,
                     'user' => [
-                    'id' => $newUser->id,
-                    'name' => $newUser->name,
-                    'email' => $newUser->email,
-                ]
+                        'id' => $newUser->id,
+                        'name' => $newUser->name,
+                        'email' => $newUser->email,
+                    ]
                 ], 200);
             }
-        }  catch (\Throwable $th) {
+        } catch (\Throwable $th) {
             return response()->json([
                 'status' => false,
                 'message' => $th->getMessage(),
             ], 500);
         }
     }
+
+
+
 }
