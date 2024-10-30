@@ -46,7 +46,7 @@ class RegisteredUserController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->string('password')),
         ]);
-        $user->assignRole($validateUser['role']);
+         $user->assignRole($request->input('role'));;
         event(new Registered($user));
         $userID = $user->id;
 
@@ -65,7 +65,7 @@ class RegisteredUserController extends Controller
                     'name' => $user->name,
                     'email' => $user->email,
                     'roles' => $roles,
-                    // 'permissions'=>$permissions,
+                    'permissions'=>$permissions,
 
                 ]
             ], 201);

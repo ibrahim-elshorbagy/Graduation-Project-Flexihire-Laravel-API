@@ -34,5 +34,15 @@ class DatabaseSeeder extends Seeder
             'email' => 'u@u.u',
             'password' => Hash::make('u'),
         ])->assignRole($userRole);
+        User::factory()->create([
+            'name' => 'User',
+            'email' => 'f@f.f',
+            'password' => Hash::make('f'),
+        ])->assignRole($userRole);
+                User::factory()->create([
+            'name' => 'User',
+            'email' => 'c@c.c',
+            'password' => Hash::make('c'),
+        ])->assignRole($userRole);
     }
 }

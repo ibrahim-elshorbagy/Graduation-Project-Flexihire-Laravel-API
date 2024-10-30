@@ -107,6 +107,8 @@ class GoogleContoller extends Controller
                 $token = $tokenResult->plainTextToken;
 
                 $roles = $existingUser->roles->pluck('name')->toArray();
+                $permissions = $existingUser->getAllPermissions()->pluck('name');
+
 
                 return response()->json([
                     'status' => true,
@@ -117,6 +119,8 @@ class GoogleContoller extends Controller
                         'id' => $existingUser->id,
                         'name' => $existingUser->name,
                         'email' => $existingUser->email,
+                        'roles' => $roles,
+                        'permissions' => $permissions
                     ]
                 ], 200);
             } else {
@@ -135,6 +139,8 @@ class GoogleContoller extends Controller
                 $roles = $newUser->roles->pluck('name')->toArray();
 
                 $token = $newUser->createToken('GoogleAuthToken')->plainTextToken;
+                $roles = $newUser->roles->pluck('name');
+                $permissions = $newUser->getAllPermissions()->pluck('name');
 
                 return response()->json([
                     'status' => true,
@@ -145,6 +151,9 @@ class GoogleContoller extends Controller
                         'id' => $newUser->id,
                         'name' => $newUser->name,
                         'email' => $newUser->email,
+                        'roles' => $roles,
+                        'permissions' => $permissions
+
                     ]
                 ], 200);
             }
