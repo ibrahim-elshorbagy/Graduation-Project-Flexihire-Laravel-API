@@ -5,19 +5,13 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Password;
-use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Validator;
-
+use App\Models\User;
+use App\Notifications\CustomResetPasswordNotification;
+use Illuminate\Support\Facades\DB;
 class PasswordResetLinkController extends Controller
 {
-    /**
-     * Handle an incoming password reset link request.
-     *
-     * @param Request $request
-     * @return JsonResponse
-     * @throws \Illuminate\Validation\ValidationException
-     */
+
     public function store(Request $request): JsonResponse
     {
         // Validate the email address
@@ -33,23 +27,30 @@ class PasswordResetLinkController extends Controller
             ], 422);
         }
 
-        // Attempt to send the password reset link
-        $status = Password::sendResetLink($request->only('email'));
+        // Generate a password reset token
+        $token = str_pad(mt_rand(0, 999999), 6, '0', STR_PAD_LEFT);
+        DB::table('password_reset_tokens')->updateOrInsert(
+            ['email' => $request->input('email')],
+            ['token' => bcrypt($token), 'created_at' => now()]
+        );
 
-            $messages = [
-            Password::RESET_LINK_SENT => 'A password reset link has been sent to your email address.',
-            Password::INVALID_USER => 'We cannot find a user with that email address.',
-        ];
+        // Retrieve the user by email and send the notification
+        $user = User::where('email', $request->input('email'))->first();
 
-        // Check if the password reset link was not sent
-        if ($status != Password::RESET_LINK_SENT) {
-            // Throw validation exception with the appropriate message
-            throw ValidationException::withMessages([
-                'email' => [__($status)],
-            ]);
+        if (!$user) {
+            return response()->json([
+                'status' => false,
+                'message' => 'We cannot find a user with that email address.',
+            ], 404);
         }
 
-        // Return a JSON response indicating success
-        return response()->json(['status' => __($status)]);
+        $user->notify(new CustomResetPasswordNotification($token,$user));
+
+        return response()->json([
+            'status' => true,
+            'message' => 'A password reset link has been sent to your email address.',
+        ], 200);
     }
+
+
 }

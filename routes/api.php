@@ -58,37 +58,7 @@ Route::middleware(['auth:sanctum','role:user'])->group(function () {
 
 //------------------------------ Admin -----------------------------------------//
 
-Route::middleware(['auth:sanctum','role:admin'])->group(function () {
 
-    Route::prefix('admin')->group(function () {
-
-    Route::middleware(['role:admin'])->group(function () {
-        Route::resource('categories', CategoryController::class);
-        Route::resource('portfolios', PortfolioController::class);
-        Route::resource('jobs', JobController::class);
-        Route::resource('roadmaps', RoadmapController::class);
-        Route::resource('courses', CourseController::class);
-        Route::resource('products', ProductController::class);
-
-    });
-
-    });
-});
-Route::middleware(['auth:sanctum','role:admin'])->group(function () {
-
-
-    Route::prefix('user')->group(function () {
-
-    Route::middleware(['role:admin'])->group(function () {
-
-        Route::resource('applications', ApplicationController::class);
-        Route::resource('projects', ProjectController::class);
-        Route::resource('order-details', OrderDetailController::class);
-        Route::resource('order-items', OrderItemController::class);
-    });
-
-    });
-});
 
 // Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
 //     return $request->user();
