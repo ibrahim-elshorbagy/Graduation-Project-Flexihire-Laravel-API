@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Profile;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 class ProfileController extends Controller
 {
@@ -72,5 +74,41 @@ class ProfileController extends Controller
             'status' => true,
             'message' => 'User Password Updated Successfully',
         ], 201);
+    }
+    public function updateImage(Request $request)
+    {
+        $user = Auth::user();
+
+        $data = Validator::make($request->all(), [
+            'image' => ['required', 'image'],
+        ]);
+
+        // Check for validation errors
+        if ($data->fails()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Validation error',
+                'errors' => $data->errors(),
+            ], 422);
+        }
+
+        // Delete the old image if it exists
+        if ($user->image_url != null) {
+                Storage::disk('public')->deleteDirectory('User/' . $user->id . '/profile_image');
+        }
+
+        // Store the new image
+        $image = $request->file('image');
+        if ($image) {
+            $path = $image->store('User/' . $user->id . '/profile_image', 'public');
+            $user->image_url = Storage::url($path);
+            $user->save();
+        }
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Image updated successfully',
+            'image_url' => $user->image_url,
+        ], 200);
     }
 }

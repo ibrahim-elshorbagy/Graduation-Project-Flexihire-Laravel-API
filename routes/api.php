@@ -10,16 +10,6 @@ use App\Http\Controllers\Auth\NewPasswordController;
 
 use App\Http\Controllers\Auth\SignUpWith\GoogleContoller;
 use App\Http\Controllers\Profile\ProfileController;
-use App\Http\Controllers\CategoryController;
-use App\Http\Controllers\PortfolioController;
-use App\Http\Controllers\JobController;
-use App\Http\Controllers\RoadmapController;
-use App\Http\Controllers\CourseController;
-use App\Http\Controllers\ProductController;
-use App\Http\Controllers\ApplicationController;
-use App\Http\Controllers\ProjectController;
-use App\Http\Controllers\OrderDetailController;
-use App\Http\Controllers\OrderItemController;
 
 
 //------------------------------ Login system -----------------------------------------//
@@ -44,7 +34,7 @@ Route::middleware(['guest','api'])->group(function () {
 
 //------------------------------ Profile -----------------------------------------//
 
-Route::middleware(['auth:sanctum','role:user'])->group(function () {
+Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::post('/logout', [AuthenticatedSessionController::class, 'destroy']);
 
@@ -52,6 +42,7 @@ Route::middleware(['auth:sanctum','role:user'])->group(function () {
 
         Route::post('/update-name',[ProfileController::class, 'updateName']);
         Route::post('/update-password',[ProfileController::class, 'updatePassword']);
+        Route::post('/update-profile-image',[ProfileController::class, 'updateImage']);
 
     });
 });
