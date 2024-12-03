@@ -66,6 +66,9 @@ class RegisteredUserController extends Controller
                     'email' => $user->email,
                     'roles' => $roles,
                     'permissions'=>$permissions,
+                    'skills' => $user->skills ?? [],
+                    'job' => $user->jobs[0] ?? '',
+
 
                 ]
             ], 201);

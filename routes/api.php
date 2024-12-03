@@ -30,6 +30,11 @@ Route::middleware(['guest','api'])->group(function () {
     Route::get('/login-with-google',[GoogleContoller::class, 'redirectToGoogle']);
     Route::get('/google-callback',[GoogleContoller::class, 'handleGoogleCallback']);
 
+
+
+    //get Icons + Jobs
+    Route::get('/get-skills-jobs',[AuthenticatedSessionController::class, 'getSkillsAndJobs']);
+
 });
 
 //------------------------------ Profile -----------------------------------------//
@@ -38,11 +43,15 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::post('/logout', [AuthenticatedSessionController::class, 'destroy']);
 
+    Route::post('/set-skills-job',[AuthenticatedSessionController::class, 'updateSkillsAndJobs']);
+    Route::post('/check-skills-job',[AuthenticatedSessionController::class, 'checkSkillAndJob']);
+
     Route::prefix('profile')->group(function () {
 
         Route::post('/update-name',[ProfileController::class, 'updateName']);
         Route::post('/update-password',[ProfileController::class, 'updatePassword']);
         Route::post('/update-profile-image',[ProfileController::class, 'updateImage']);
+        Route::post('/update-skills-job',[AuthenticatedSessionController::class, 'updateSkillsAndJobs']);
 
     });
 });

@@ -18,31 +18,28 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // $this->call(RoleAndPermissionSeeder::class);
+        $this->call(SkillsJobsSeeder::class);
         $adminRole = Role::firstOrCreate(['name' => 'admin']);
         $userRole = Role::firstOrCreate(['name' => 'user']);
-        $userRole = Role::firstOrCreate(['name' => 'freelancer']);
-        $userRole = Role::firstOrCreate(['name' => 'customer']);
+        $companyRole = Role::firstOrCreate(['name' => 'company']);
 
         User::factory()->create([
-            'name' => 'Admin',
+            'name' => 'Admin ibrahim',
             'email' => 'a@a.a',
             'password' => Hash::make('a'),
         ])->assignRole($adminRole);
 
         User::factory()->create([
-            'name' => 'User',
+            'name' => 'User ahmed',
             'email' => 'u@u.u',
             'password' => Hash::make('u'),
         ])->assignRole($userRole);
+
         User::factory()->create([
-            'name' => 'User',
-            'email' => 'f@f.f',
-            'password' => Hash::make('f'),
-        ])->assignRole($userRole);
-                User::factory()->create([
-            'name' => 'User',
+            'name' => 'Company mohmed',
             'email' => 'c@c.c',
             'password' => Hash::make('c'),
-        ])->assignRole($userRole);
+        ])->assignRole($companyRole);
+
     }
 }

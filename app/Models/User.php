@@ -3,6 +3,9 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+
+use App\Models\Auth\OurJob;
+use App\Models\Auth\Skill;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -55,6 +58,17 @@ class User extends Authenticatable
     public function sendPasswordResetNotification($token)
     {
         $this->notify(new CustomResetPasswordNotification($token, $this->email));
+    }
+
+    public function skills()
+    {
+        return $this->belongsToMany(Skill::class, 'user_skills');
+    }
+
+    // Define relationship with jobs
+    public function jobs()
+    {
+        return $this->belongsToMany(OurJob::class, 'user_jobs');
     }
 
 }
