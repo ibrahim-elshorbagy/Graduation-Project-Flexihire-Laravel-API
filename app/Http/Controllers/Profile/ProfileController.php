@@ -39,6 +39,33 @@ class ProfileController extends Controller
 
     }
 
+    public function updateDescription(Request $request)
+    {
+        $validateUser = Validator::make($request->all(), [
+            'description' => ['required', 'string'],
+        ]);
+
+
+        if ($validateUser->fails()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Validation error',
+                'errors' => $validateUser->errors(),
+            ], 422);
+        }
+
+        $user = auth()->user()->update([
+            'description' => $request->description,
+        ]);
+
+        return response()->json([
+                'status' => true,
+                'message' => 'User Description Updated Successfully',
+            ], 201);
+
+    }
+
+    
     public function UpdatePassword(Request $request)
     {
         // Validate the request data
