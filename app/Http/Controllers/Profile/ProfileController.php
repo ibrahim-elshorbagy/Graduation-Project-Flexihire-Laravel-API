@@ -10,7 +10,7 @@ use Illuminate\Validation\Rules;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\ImageManager;
-use Intervention\Image\Drivers\Imagick\Driver;
+use Intervention\Image\Drivers\Gd\Driver;
 
 class ProfileController extends Controller
 {
@@ -248,6 +248,16 @@ class ProfileController extends Controller
 
 
 
+
+
+
+
+
+
+
+
+
+
     public function updateCV(Request $request)
     {
         $user = Auth::user();
@@ -255,6 +265,7 @@ class ProfileController extends Controller
         $data = Validator::make($request->all(), [
             'cv' => ['required', 'mimes:pdf,doc,docx', 'max:5120'],
         ]);
+
         // Check for validation errors
         if ($data->fails()) {
             return response()->json([
@@ -275,20 +286,21 @@ class ProfileController extends Controller
                 Storage::disk('public')->makeDirectory($directoryPath, 0755, true);
             }
 
-            // Generate the full cv path
-            $cvPath = $directoryPath . '/' . uniqid('cv_') . '.' . $cv->getClientOriginalExtension();
+            // Generate filename
+            $filename = uniqid('cv_') . '.' . $cv->getClientOriginalExtension();
 
-            // Save the cv with compression
-            $fullPath = Storage::disk('public')->path($cvPath);
-            $cv->storeAs($directoryPath, $cvPath);
+            // Store the file directly
+            Storage::disk('public')->putFileAs($directoryPath, $cv, $filename);
 
-            // Get the public URL of the stored cv
+            // Generate the path for database
+            $cvPath = $directoryPath . '/' . $filename;
+
+            // Get the complete URL with domain
             $cvUrl = config('app.url') . Storage::url($cvPath);
 
             // Save the complete URL in the database
             $user->cv = $cvUrl;
             $user->save();
-
         }
 
         return response()->json([
