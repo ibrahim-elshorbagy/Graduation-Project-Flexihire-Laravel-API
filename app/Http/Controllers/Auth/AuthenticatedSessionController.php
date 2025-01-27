@@ -37,8 +37,12 @@ class AuthenticatedSessionController extends Controller
             return response()->json([
                 'user' => [
                     'id' => $user->id,
-                    'name' => $user->name,
+                    'first_name' => $user->first_name,
+                    'last_name' => $user->last_name,
                     'email' => $user->email,
+                    'image_url' => $user->image_url,
+                    'background_url' => $user->background_url,
+                    'cv' => $user->cv,
                     'roles' => $roles,
                     'permissions'=>$permissions,
                     'skills' => $user->skills ?? [],

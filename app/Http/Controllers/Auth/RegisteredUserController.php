@@ -26,7 +26,8 @@ class RegisteredUserController extends Controller
         try {
 
         $validateUser = Validator::make($request->all(), [
-            'name' => ['required', 'string'],
+            'first_name' => ['required', 'string'],
+            'last_name' => ['required', 'string'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'role'=>    ['required','string']
@@ -42,7 +43,8 @@ class RegisteredUserController extends Controller
         }
 
         $user = User::create([
-            'name' => $request->name,
+            'first_name' => $request->first_name,
+            'last_name' => $request->last_name,
             'email' => $request->email,
             'password' => Hash::make($request->string('password')),
         ]);
@@ -62,8 +64,11 @@ class RegisteredUserController extends Controller
                 'token' => $token,
                 'user' => [
                     'id' => $user->id,
-                    'name' => $user->name,
+                    'first_name' => $user->first_name,
+                    'last_name' => $user->last_name,
                     'email' => $user->email,
+                    'image_url' => $user->image_url,
+                    'background_url' => $user->background_url,
                     'roles' => $roles,
                     'permissions'=>$permissions,
                     'skills' => $user->skills ?? [],

@@ -9,13 +9,18 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use Intervention\Image\ImageManager;
+use Intervention\Image\Drivers\Imagick\Driver;
 
 class ProfileController extends Controller
 {
+
+
     public function UpdateName(Request $request)
     {
         $validateUser = Validator::make($request->all(), [
-            'name' => ['required', 'string'],
+            'first_name' => ['required', 'string'],
+            'last_name' => ['required', 'string'],
         ]);
 
 
@@ -28,12 +33,15 @@ class ProfileController extends Controller
         }
 
         $user = auth()->user()->update([
-            'name' => $request->name,
+            'first_name' => $request->first_name,
+            'last_name' => $request->last_name,
         ]);
 
         return response()->json([
                 'status' => true,
                 'message' => 'User Name Updated Successfully',
+                'first_name' => $user->first_name,
+                'last_name' => $user->last_name,
             ], 201);
 
 
@@ -61,11 +69,22 @@ class ProfileController extends Controller
         return response()->json([
                 'status' => true,
                 'message' => 'User Description Updated Successfully',
+                'description' => $user->description,
             ], 201);
 
     }
 
-    
+
+
+
+
+
+
+
+
+
+
+
     public function UpdatePassword(Request $request)
     {
         // Validate the request data
@@ -102,6 +121,15 @@ class ProfileController extends Controller
             'message' => 'User Password Updated Successfully',
         ], 201);
     }
+
+
+
+
+
+
+
+
+
     public function updateImage(Request $request)
     {
         $user = Auth::user();
@@ -119,16 +147,33 @@ class ProfileController extends Controller
             ], 422);
         }
 
-        // Delete the old image if it exists
-        if ($user->image_url != null) {
-                Storage::disk('public')->deleteDirectory('User/' . $user->id . '/profile_image');
-        }
+        // Handle images upload
+        $manager = new ImageManager(new Driver());
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            // Generate the directory path
+            $directoryPath = 'User/' . $user->id . '/profile/profile_image';
 
-        // Store the new image
-        $image = $request->file('image');
-        if ($image) {
-            $path = $image->store('User/' . $user->id . '/profile_image', 'public');
-            $user->image_url = Storage::url($path);
+            // Ensure the directory exists
+            if (!Storage::disk('public')->exists($directoryPath)) {
+                Storage::disk('public')->makeDirectory($directoryPath, 0755, true);
+            }
+
+            // Generate the full image path
+            $imagePath = $directoryPath . '/' . uniqid('user_') . '.' . $image->getClientOriginalExtension();
+
+            // Read the image using Intervention Image
+            $img = $manager->read($image);
+
+            // Save the image with compression
+            $fullPath = Storage::disk('public')->path($imagePath);
+            $img->save($fullPath, 80);
+
+            // Get the public URL of the stored image
+            $imageUrl = config('app.url') . Storage::url($imagePath);
+
+            // Save the complete URL in the database
+            $user->image_url = $imageUrl;
             $user->save();
         }
 
@@ -136,6 +181,120 @@ class ProfileController extends Controller
             'status' => true,
             'message' => 'Image updated successfully',
             'image_url' => $user->image_url,
+        ], 200);
+    }
+
+
+
+
+
+
+
+
+    public function updateBackgroundImage(Request $request)
+    {
+        $user = Auth::user();
+
+        $data = Validator::make($request->all(), [
+            'background_image' => ['required', 'image'],
+        ]);
+
+        // Check for validation errors
+        if ($data->fails()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Validation error',
+                'errors' => $data->errors(),
+            ], 422);
+        }
+
+        // Handle background image upload
+        $manager = new ImageManager(new Driver());
+        if ($request->hasFile('background_image')) {
+            $image = $request->file('background_image');
+            // Generate the directory path
+            $directoryPath = 'User/' . $user->id . '/profile/background_image';
+
+            // Ensure the directory exists
+            if (!Storage::disk('public')->exists($directoryPath)) {
+                Storage::disk('public')->makeDirectory($directoryPath, 0755, true);
+            }
+
+            // Generate the full image path
+            $imagePath = $directoryPath . '/' . uniqid('background_') . '.' . $image->getClientOriginalExtension();
+
+            // Read the image using Intervention Image
+            $img = $manager->read($image);
+
+            // Save the image with compression
+            $fullPath = Storage::disk('public')->path($imagePath);
+            $img->save($fullPath, 80);
+
+            // Get the public URL of the stored image
+            $backgroundUrl = config('app.url') . Storage::url($imagePath);
+
+            // Save the complete URL in the database
+            $user->background_url = $backgroundUrl;
+            $user->save();
+        }
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Background image updated successfully',
+            'background_url' => $user->background_url,
+        ], 200);
+    }
+
+
+
+
+    public function updateCV(Request $request)
+    {
+        $user = Auth::user();
+
+        $data = Validator::make($request->all(), [
+            'cv' => ['required', 'mimes:pdf,doc,docx', 'max:5120'],
+        ]);
+        // Check for validation errors
+        if ($data->fails()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Validation error',
+                'errors' => $data->errors(),
+            ], 422);
+        }
+
+        // Handle cv upload
+        if ($request->hasFile('cv')) {
+            $cv = $request->file('cv');
+            // Generate the directory path
+            $directoryPath = 'User/' . $user->id . '/profile/cv';
+
+            // Ensure the directory exists
+            if (!Storage::disk('public')->exists($directoryPath)) {
+                Storage::disk('public')->makeDirectory($directoryPath, 0755, true);
+            }
+
+            // Generate the full cv path
+            $cvPath = $directoryPath . '/' . uniqid('cv_') . '.' . $cv->getClientOriginalExtension();
+
+            // Save the cv with compression
+            $fullPath = Storage::disk('public')->path($cvPath);
+            $cv->storeAs($directoryPath, $cvPath);
+
+            // Get the public URL of the stored cv
+            $cvUrl = config('app.url') . Storage::url($cvPath);
+
+            // Save the complete URL in the database
+            $user->cv = $cvUrl;
+            $user->save();
+
+        }
+
+        return response()->json([
+            'status' => true,
+            'message' => 'CV updated successfully',
+            'cv' => $user->cv,
         ], 200);
     }
 }

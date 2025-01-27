@@ -28,7 +28,7 @@ class GoogleContoller extends Controller
     {
         // Validate the incoming request
         $validateUser = Validator::make($request->all(), [
-            'role' => 'required|in:freelancer,customer',
+            'role' => 'required|in:user,company',
         ]);
 
         if ($validateUser->fails()) {
@@ -79,7 +79,7 @@ class GoogleContoller extends Controller
 
             // Validate the role
             $validateUser = Validator::make(['role' => $role], [
-                'role' => 'required|in:freelancer,customer',
+                'role' => 'required|in:user,company',
             ]);
 
             if ($validateUser->fails()) {
@@ -93,7 +93,6 @@ class GoogleContoller extends Controller
             // Proceed with Socialite user retrieval
             $socialiteUser = Socialite::driver('google')->stateless()->user();
 
-            // Existing user logic...
             $existingUser = User::where('email', $socialiteUser->email)->first();
 
             if ($existingUser) {
@@ -117,8 +116,12 @@ class GoogleContoller extends Controller
                     'roles' => $roles,
                     'user' => [
                         'id' => $existingUser->id,
-                        'name' => $existingUser->name,
+                        'first_name' => $existingUser->first_name,
+                        'last_name' => $existingUser->last_name,
                         'email' => $existingUser->email,
+                        'image_url' => $existingUser->image_url,
+                        'background_url' => $existingUser->background_url,
+                        'cv' => $existingUser->cv,
                         'roles' => $roles,
                         'permissions' => $permissions
                     ]
@@ -126,10 +129,11 @@ class GoogleContoller extends Controller
             } else {
                 // Create a new user with the retrieved role
                 $newUser = User::create([
-                    'name' => $socialiteUser->name,
+                    'first_name' => explode(' ', $socialiteUser->name)[0],
+                    'last_name' => explode(' ', $socialiteUser->name)[1],
                     'email' => $socialiteUser->email,
                     'google_id' => $socialiteUser->id,
-                    'password' => Hash::make('secure_password'), // Ensure you use a secure method
+                    'password' => Hash::make('Ha41w56d15613123'),
                 ]);
 
                 Auth::login($newUser);
@@ -149,8 +153,12 @@ class GoogleContoller extends Controller
                     'token' => $token,
                     'user' => [
                         'id' => $newUser->id,
-                        'name' => $newUser->name,
+                        'first_name' => $newUser->first_name,
+                        'last_name' => $newUser->last_name,
                         'email' => $newUser->email,
+                        'image_url' => $newUser->image_url,
+                        'background_url' => $newUser->background_url,
+                        'cv' => $newUser->cv,
                         'roles' => $roles,
                         'permissions' => $permissions
 

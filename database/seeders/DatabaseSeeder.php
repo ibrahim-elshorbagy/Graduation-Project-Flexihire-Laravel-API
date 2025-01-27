@@ -24,19 +24,22 @@ class DatabaseSeeder extends Seeder
         $companyRole = Role::firstOrCreate(['name' => 'company']);
 
         User::factory()->create([
-            'name' => 'Admin ibrahim',
+            'first_name' => 'Admin',
+            'last_name' => 'ibrahim',
             'email' => 'a@a.a',
             'password' => Hash::make('a'),
         ])->assignRole($adminRole);
 
         User::factory()->create([
-            'name' => 'User ahmed',
+            'first_name' => 'User',
+            'last_name' => 'ahmed',
             'email' => 'u@u.u',
             'password' => Hash::make('u'),
         ])->assignRole($userRole);
 
         User::factory()->create([
-            'name' => 'Company mohmed',
+            'first_name' => 'Company',
+            'last_name' => 'Mohmed',
             'email' => 'c@c.c',
             'password' => Hash::make('c'),
         ])->assignRole($companyRole);

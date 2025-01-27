@@ -51,6 +51,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('/update-name',[ProfileController::class, 'updateName']);
         Route::post('/update-password',[ProfileController::class, 'updatePassword']);
         Route::post('/update-profile-image',[ProfileController::class, 'updateImage']);
+        Route::post('/update-profile-background-image',[ProfileController::class, 'updateBackgroundImage']);
+        Route::post('/update-profile-background-image',[ProfileController::class, 'updateBackgroundImage']);
+        Route::post('/update-profile-cv',[ProfileController::class, 'updateCV']);
         Route::post('/update-profile-description',[ProfileController::class, 'updateDescription']);
         Route::post('/update-skills-job',[AuthenticatedSessionController::class, 'updateSkillsAndJobs']);
 
