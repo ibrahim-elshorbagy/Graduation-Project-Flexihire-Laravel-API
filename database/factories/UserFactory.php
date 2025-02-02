@@ -26,9 +26,15 @@ class UserFactory extends Factory
             'password'           => Hash::make('password'),
             'remember_token'     => Str::random(10),
             // Additional fields
-            'image_url'          => $this->faker->imageUrl(640, 480, 'people', true),
-            'background_url'     => $this->faker->imageUrl(640, 480, 'business', true),
-            'cv'                 => $this->faker->url(), 
+            'image_url'          => function () {
+                $name = $this->faker->firstName();
+                return 'https://ui-avatars.com/api/?name=' . urlencode($name);
+            },
+            'background_url'          => function () {
+                $name = $this->faker->firstName();
+                return 'https://fakeimg.pl/800x400/?text=' . urlencode($name) . '&font=lobster';
+            },
+            'cv'                 => $this->faker->url(),
         ];
     }
 
