@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\RegisteredUserController;
@@ -59,6 +60,14 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     });
 });
+//------------------------------ Anyone -----------------------------------------//
+
+
+    Route::get('/users', [UserController::class, 'getUsers']);
+    Route::get('/companies', [UserController::class, 'getCompanies']);
+    Route::get('/user/{id}', [UserController::class, 'getUserInfo']);
+    Route::get('/company/{id}', [UserController::class, 'getCompanyInfo']);
+
 
 //------------------------------ Admin -----------------------------------------//
 

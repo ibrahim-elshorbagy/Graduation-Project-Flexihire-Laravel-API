@@ -32,7 +32,9 @@ class ProfileController extends Controller
             ], 422);
         }
 
-        $user = auth()->user()->update([
+        $user = auth()->user();
+
+        $user->update([
             'first_name' => $request->first_name,
             'last_name' => $request->last_name,
         ]);
@@ -53,7 +55,6 @@ class ProfileController extends Controller
             'description' => ['required', 'string'],
         ]);
 
-
         if ($validateUser->fails()) {
             return response()->json([
                 'status' => false,
@@ -62,16 +63,16 @@ class ProfileController extends Controller
             ], 422);
         }
 
-        $user = auth()->user()->update([
-            'description' => $request->description,
-        ]);
+        $user = auth()->user();
+
+        $user->description = $request->description;
+        $user->save();
 
         return response()->json([
-                'status' => true,
-                'message' => 'User Description Updated Successfully',
-                'description' => $user->description,
-            ], 201);
-
+            'status' => true,
+            'message' => 'User Description Updated Successfully',
+            'description' => $user->description,
+        ], 201);
     }
 
 

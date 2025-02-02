@@ -17,6 +17,8 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+
+
         // $this->call(RoleAndPermissionSeeder::class);
         $this->call(SkillsJobsSeeder::class);
         $adminRole = Role::firstOrCreate(['name' => 'admin']);
@@ -43,6 +45,9 @@ class DatabaseSeeder extends Seeder
             'email' => 'c@c.c',
             'password' => Hash::make('c'),
         ])->assignRole($companyRole);
+
+        User::factory()->count(25)->userRole()->create();
+        User::factory()->count(25)->companyRole()->create();
 
     }
 }

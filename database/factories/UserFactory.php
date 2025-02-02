@@ -2,44 +2,57 @@
 
 namespace Database\Factories;
 
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
-/**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\User>
- */
 class UserFactory extends Factory
 {
-    /**
-     * The current password being used by the factory.
-     */
-    protected static ?string $password;
+    protected $model = User::class;
 
     /**
      * Define the model's default state.
      *
-     * @return array<string, mixed>
+     * @return array
      */
     public function definition(): array
     {
         return [
-            'first_name' => fake()->firstName(),
-            'last_name' => fake()->lastName(),
-            'email' => fake()->unique()->safeEmail(),
-            'email_verified_at' => now(),
-            'password' => static::$password ??= Hash::make('password'),
-            'remember_token' => Str::random(10),
+            'first_name'         => $this->faker->firstName(),
+            'last_name'          => $this->faker->lastName(),
+            'email'              => $this->faker->unique()->safeEmail(),
+            'email_verified_at'  => now(),
+            'password'           => Hash::make('password'),
+            'remember_token'     => Str::random(10),
+            // Additional fields
+            'image_url'          => $this->faker->imageUrl(640, 480, 'people', true),
+            'background_url'     => $this->faker->imageUrl(640, 480, 'business', true),
+            'cv'                 => $this->faker->url(), 
         ];
     }
 
     /**
-     * Indicate that the model's email address should be unverified.
+     * Indicate that the user has the "user" role.
+     *
+     * @return \Illuminate\Database\Eloquent\Factories\Factory
      */
-    public function unverified(): static
+    public function userRole()
     {
-        return $this->state(fn (array $attributes) => [
-            'email_verified_at' => null,
-        ]);
+        return $this->afterCreating(function (User $user) {
+            $user->assignRole('user');
+        });
+    }
+
+    /**
+     * Indicate that the user has the "company" role.
+     *
+     * @return \Illuminate\Database\Eloquent\Factories\Factory
+     */
+    public function companyRole()
+    {
+        return $this->afterCreating(function (User $user) {
+            $user->assignRole('company');
+        });
     }
 }

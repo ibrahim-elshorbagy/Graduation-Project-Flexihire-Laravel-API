@@ -96,7 +96,6 @@ class AuthenticatedSessionController extends Controller
             'jobs' => $jobs
         ]);
     }
-
     public function updateSkillsAndJobs(Request $request)
     {
         $user = $request->user();
@@ -114,13 +113,14 @@ class AuthenticatedSessionController extends Controller
             ], 422);
         }
 
+        // Sync skills - this will remove any previously attached skills and attach only the new ones
         if ($request->has('skill_id')) {
-            $user->skills()->syncWithoutDetaching($request->skill_id);
+            $user->skills()->sync($request->skill_id);
         }
 
+        // Sync job - ensures the user has only one job at a time
         if ($request->has('job_id')) {
-            $job = OurJob::findOrFail($request->job_id);
-            $user->jobs()->sync([$job->id]);
+            $user->jobs()->sync([$request->job_id]);
         }
 
         $user->load('skills', 'jobs');
@@ -130,6 +130,7 @@ class AuthenticatedSessionController extends Controller
             'user' => $user,
         ]);
     }
+
 
     public function checkSkillAndJob(Request $request)
     {
