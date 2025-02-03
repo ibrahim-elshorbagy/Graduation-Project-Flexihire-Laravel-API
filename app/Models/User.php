@@ -71,7 +71,12 @@ class User extends Authenticatable
     // Define relationship with jobs
     public function jobs()
     {
-        return $this->belongsToMany(OurJob::class, 'user_jobs');
+        return $this->belongsToMany(OurJob::class, 'user_job_title', 'user_id', 'our_jobs_title_id');
+    }
+
+    public function JobList()
+    {
+        return $this->hasMany(JobList::class);
     }
 
 }

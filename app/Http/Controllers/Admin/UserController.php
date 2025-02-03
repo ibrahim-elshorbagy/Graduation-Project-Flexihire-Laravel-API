@@ -87,29 +87,25 @@ class UserController extends Controller
             ], 404);
         }
 
-        // Retrieve the company (user) or fail
-        $company = User::findOrFail($id);
+        $company = User::with('jobs')->findOrFail($id);
 
-        // Verify the user has the role "company"
         if (!$company->hasRole('company')) {
             return response()->json([
                 'message' => 'Company not found or not a valid company role.'
             ], 404);
         }
 
-
         return response()->json([
             'company' => [
-                'id'              => $company->id,
-                'first_name'      => $company->first_name,
-                'last_name'       => $company->last_name,
-                'email'           => $company->email,
-                'image_url'       => $company->image_url,
-                'background_url'  => $company->background_url,
-                'cv'              => $company->cv,
-                'skills'          => $company->skills ?? [],
-                // Placeholder for job(s) information; can be expanded in the future.
-                // 'job'             => $company->jobs[0] ?? null,
+                'id' => $company->id,
+                'first_name' => $company->first_name,
+                'last_name' => $company->last_name,
+                'email' => $company->email,
+                'image_url' => $company->image_url,
+                'background_url' => $company->background_url,
+                'cv' => $company->cv,
+                // 'skills' => $company->skills ?? [],
+                'jobs' => $company->JobList
             ],
         ], 200);
     }

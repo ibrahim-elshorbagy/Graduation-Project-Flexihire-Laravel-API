@@ -10,11 +10,11 @@ class OurJob extends Model
 {
     protected $table = 'our_jobs_title';
     use HasFactory;
-    protected $gurded = ['id'];
+    protected $guarded = ['id'];
     public $timestamps = false;
 
     public function users()
     {
-        return $this->belongsToMany(User::class, 'user_jobs');
+        return $this->belongsToMany(User::class, 'user_job_title', 'our_jobs_title_id', 'user_id');
     }
 }

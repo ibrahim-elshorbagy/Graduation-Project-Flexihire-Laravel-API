@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\JobList;
 use App\Models\Product;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -47,7 +48,18 @@ class DatabaseSeeder extends Seeder
         ])->assignRole($companyRole);
 
         User::factory()->count(25)->userRole()->create();
-        User::factory()->count(25)->companyRole()->create();
+        User::factory()
+            ->count(25)
+            ->companyRole()
+            ->afterCreating(function ($user) {
+                JobList::factory()
+                    ->count(3)
+                    ->create([
+                        'user_id' => $user->id
+                    ]);
+            })
+            ->create();
+
 
     }
 }

@@ -10,6 +10,7 @@ use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\NewPasswordController;
 
 use App\Http\Controllers\Auth\SignUpWith\GoogleContoller;
+use App\Http\Controllers\Company\JobListController;
 use App\Http\Controllers\Profile\ProfileController;
 
 
@@ -68,10 +69,20 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/user/{id}', [UserController::class, 'getUserInfo']);
     Route::get('/company/{id}', [UserController::class, 'getCompanyInfo']);
 
+//------------------------------ Anyone company -----------------------------------------//
 
-//------------------------------ Admin -----------------------------------------//
+    Route::get('/all-jobs', [JobListController::class, 'index']);
+    Route::get('/company/get-job/{id}', [JobListController::class, 'show']);
 
 
+//------------------------------ Only company -----------------------------------------//
+    Route::middleware(['auth:sanctum', 'role:company'])->group(function () {
+
+        Route::post('/company/create-job', [JobListController::class, 'store']);
+        Route::post('/company/update-job/{id}', [JobListController::class, 'update']);
+        Route::post('/company/delete-job/{id}', [JobListController::class, 'destroy']);
+
+    });
 
 // Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
 //     return $request->user();

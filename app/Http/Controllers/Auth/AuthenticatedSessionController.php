@@ -103,7 +103,7 @@ class AuthenticatedSessionController extends Controller
         $validator = Validator::make($request->all(), [
             'skill_id' => 'required|array',
             'skill_id.*' => 'exists:skills,id',
-            'job_id' => 'required|exists:our_jobs,id',
+            'job_id' => 'required|exists:our_jobs_title,id',
         ]);
 
         if ($validator->fails()) {
