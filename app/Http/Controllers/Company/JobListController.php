@@ -51,7 +51,7 @@ class JobListController extends Controller
 
         return response()->json([
             'status' => true,
-            'message' => 'JobList created successfully',
+            'message' => 'Job created successfully',
             'job' => $job
         ], 201);
     }
@@ -77,7 +77,7 @@ class JobListController extends Controller
         if (!$job) {
             return response()->json([
                 'status' => false,
-                'message' => 'JobList not found'
+                'message' => 'Job not found'
             ], 404);
         }
 
@@ -107,7 +107,7 @@ class JobListController extends Controller
 
         return response()->json([
             'status' => true,
-            'message' => 'JobList updated successfully',
+            'message' => 'Job updated successfully',
             'job' => $job
         ]);
     }
@@ -119,7 +119,7 @@ class JobListController extends Controller
         if (!$job) {
             return response()->json([
                 'status' => false,
-                'message' => 'JobList not found'
+                'message' => 'Job not found'
             ], 404);
         }
 
@@ -134,7 +134,7 @@ class JobListController extends Controller
 
         return response()->json([
             'status' => true,
-            'message' => 'JobList deleted successfully'
+            'message' => 'Job deleted successfully'
         ]);
     }
 
