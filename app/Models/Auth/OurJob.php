@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class OurJob extends Model
 {
+    protected $table = 'our_jobs_title';
     use HasFactory;
     protected $gurded = ['id'];
     public $timestamps = false;

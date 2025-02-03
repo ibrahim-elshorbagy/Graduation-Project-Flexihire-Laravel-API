@@ -130,7 +130,7 @@ class SkillsJobsSeeder extends Seeder
         ];
 
         foreach ($jobs as $job) {
-            DB::table('our_jobs')->insert(['name' => $job]);
+            DB::table('our_jobs_title')->insert(['name' => $job]);
         }
     }
 }
