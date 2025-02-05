@@ -49,7 +49,7 @@ class AuthenticatedSessionController extends Controller
                     'job' => $user->jobs[0] ?? '',
 
                 ],
-                'access_token' => $token,
+                'token' => $token,
                 'token_type' => 'Bearer',
             ]);
         try {
