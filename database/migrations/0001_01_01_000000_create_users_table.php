@@ -21,7 +21,9 @@ return new class extends Migration
             $table->string('image_url')->nullable();
             $table->string('background_url')->nullable();
             $table->string('cv')->nullable();
+            $table->string('location')->nullable();
             $table->text('description')->nullable();
+
             $table->rememberToken();
             $table->timestamps();
         });

@@ -78,6 +78,32 @@ class ProfileController extends Controller
 
 
 
+    public function updateLocationn(Request $request)
+    {
+        $validateUser = Validator::make($request->all(), [
+            'location' => ['required', 'string'],
+        ]);
+
+        if ($validateUser->fails()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Validation error',
+                'errors' => $validateUser->errors(),
+            ], 422);
+        }
+
+        $user = auth()->user();
+
+        $user->location = $request->location;
+        $user->save();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Location Updated Successfully',
+            'location' => $user->location,
+        ], 201);
+    }
+
 
 
 

@@ -57,6 +57,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('/update-profile-background-image',[ProfileController::class, 'updateBackgroundImage']);
         Route::post('/update-profile-cv',[ProfileController::class, 'updateCV']);
         Route::post('/update-profile-description',[ProfileController::class, 'updateDescription']);
+        Route::post('/update-profile-location',[ProfileController::class, 'updateLocationn']);
         Route::post('/update-skills-job',[AuthenticatedSessionController::class, 'updateSkillsAndJobs']);
 
     });
