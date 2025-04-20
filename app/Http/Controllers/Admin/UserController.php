@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
@@ -14,6 +15,7 @@ class UserController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'per_page' => 'nullable|integer|min:1|max:250',
+            'search' => 'nullable|string|max:255'
         ]);
 
         if ($validator->fails()) {
@@ -24,8 +26,13 @@ class UserController extends Controller
         }
 
         $perPage = $request->per_page ?? 10;
+        $search = $request->search ?? '';
 
-        $users = User::role('user')->paginate($perPage);
+        $users = User::role('user')
+            ->when($search !== '', function ($query) use ($search) {
+                $query->where(DB::raw("CONCAT(first_name, ' ', last_name)"), 'like', "%{$search}%");
+            })
+            ->paginate($perPage);
 
         return response()->json([
             'message' => 'Users retrieved successfully.',
@@ -37,6 +44,7 @@ class UserController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'per_page' => 'nullable|integer|min:1|max:250',
+            'search' => 'nullable|string|max:255'
         ]);
 
         if ($validator->fails()) {
@@ -47,8 +55,13 @@ class UserController extends Controller
         }
 
         $perPage = $request->per_page ?? 10;
+        $search = $request->search ?? '';
 
-        $companies = User::role('company')->paginate($perPage);
+        $companies = User::role('company')
+            ->when($search !== '', function ($query) use ($search) {
+                $query->where(DB::raw("CONCAT(first_name, ' ', last_name)"), 'like', "%{$search}%");
+            })
+            ->paginate($perPage);
 
         return response()->json([
             'message' => 'Companies retrieved successfully.',

@@ -16,6 +16,7 @@ class JobListController extends Controller
         // Validate the per_page parameter
         $validator = Validator::make($request->all(), [
             'per_page' => 'nullable|integer|min:1|max:100',
+            'search' => 'nullable|string|max:255'
         ]);
 
         if ($validator->fails()) {
@@ -26,9 +27,14 @@ class JobListController extends Controller
         }
 
         $perPage = $request->per_page ?? 10; // Default to 10 if not provided
+        $search = $request->search ?? '';
 
-        // Get paginated jobs with user relationship
-        $jobs = JobList::with('user')->paginate($perPage);
+        // Get paginated jobs with user relationship and search
+        $jobs = JobList::with('user')
+            ->when($search !== '', function ($query) use ($search) {
+                $query->where('title', 'like', "%{$search}%");
+            })
+            ->paginate($perPage);
 
         return response()->json([
             'message' => 'Jobs retrieved successfully',
