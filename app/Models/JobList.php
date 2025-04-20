@@ -16,4 +16,10 @@ class JobList extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    protected $casts = [
+        'skills' => 'array',
+        'salary_negotiable' => 'boolean',
+        'hiring_multiple_candidates' => 'boolean',
+    ];
 }

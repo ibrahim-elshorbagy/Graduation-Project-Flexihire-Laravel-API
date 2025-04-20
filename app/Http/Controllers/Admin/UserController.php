@@ -9,26 +9,49 @@ use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
 {
+
     public function getUsers(Request $request)
     {
+        $validator = Validator::make($request->all(), [
+            'per_page' => 'nullable|integer|min:1|max:250',
+        ]);
 
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Validation error',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
 
-        $users = User::role('user')->get();
+        $perPage = $request->per_page ?? 10;
+
+        $users = User::role('user')->paginate($perPage);
 
         return response()->json([
-            'message' => 'Users.',
+            'message' => 'Users retrieved successfully.',
             'data' => $users,
         ], 200);
     }
 
-
     public function getCompanies(Request $request)
     {
+        $validator = Validator::make($request->all(), [
+            'per_page' => 'nullable|integer|min:1|max:250',
+        ]);
 
-        $companies = User::role('company')->get();
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Validation error',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        $perPage = $request->per_page ?? 10;
+
+        $companies = User::role('company')->paginate($perPage);
 
         return response()->json([
-            'message' => 'companies.',
+            'message' => 'Companies retrieved successfully.',
             'data' => $companies,
         ], 200);
     }
@@ -66,9 +89,9 @@ class UserController extends Controller
                 'email'           => $user->email,
                 'image_url'       => $user->image_url,
                 'background_url'  => $user->background_url,
+                'description'     => $user->description,
                 'cv'              => $user->cv,
                 'skills'          => $user->skills ?? [],
-                // Assuming a one-to-one relation or retrieving the first job entry.
                 'job'             => $user->jobs[0] ?? null,
             ],
         ], 200);
@@ -103,8 +126,8 @@ class UserController extends Controller
                 'email' => $company->email,
                 'image_url' => $company->image_url,
                 'background_url' => $company->background_url,
+                'description'     => $company->description,
                 'cv' => $company->cv,
-                // 'skills' => $company->skills ?? [],
                 'jobs' => $company->JobList
             ],
         ], 200);

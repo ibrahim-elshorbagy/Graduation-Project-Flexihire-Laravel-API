@@ -10,19 +10,46 @@ use Illuminate\Support\Facades\Validator;
 
 class JobListController extends Controller
 {
-    public function index()
+
+    public function index(Request $request)
     {
-        $jobs = JobList::with('user')->get();
-        return response()->json(['jobs' => $jobs]);
+        // Validate the per_page parameter
+        $validator = Validator::make($request->all(), [
+            'per_page' => 'nullable|integer|min:1|max:100',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Validation error',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        $perPage = $request->per_page ?? 10; // Default to 10 if not provided
+
+        // Get paginated jobs with user relationship
+        $jobs = JobList::with('user')->paginate($perPage);
+
+        return response()->json([
+            'message' => 'Jobs retrieved successfully',
+            'data' => $jobs,
+        ]);
     }
 
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'title' => 'required|string',
-            'location' => 'required|string',
+            'title' => 'required|string|max:255',
+            'location' => 'required|string|max:100',
             'description' => 'required|string',
-            'skills' => 'required|string',
+            'skills' => 'array',
+            'skills.*' => 'string',
+            'min_salary' => 'nullable|integer|min:0',
+            'max_salary' => 'nullable|integer|min:0|gt:min_salary',
+            'salary_negotiable' => 'nullable|boolean',
+            'payment_period' => 'nullable|in:hourly,daily,weekly,monthly,yearly',
+            'payment_currency' => 'nullable|string|size:3',
+            'hiring_multiple_candidates' => 'nullable|boolean',
         ]);
 
         if ($validator->fails()) {
@@ -46,6 +73,12 @@ class JobListController extends Controller
             'location' => $request->location,
             'description' => $request->description,
             'skills' => $request->skills,
+            'min_salary' => $request->min_salary,
+            'max_salary' => $request->max_salary,
+            'salary_negotiable' => $request->salary_negotiable ?? false,
+            'payment_period' => $request->payment_period,
+            'payment_currency' => $request->payment_currency ?? 'USD',
+            'hiring_multiple_candidates' => $request->hiring_multiple_candidates ?? false,
             'date_posted' => now(),
         ]);
 
@@ -89,10 +122,17 @@ class JobListController extends Controller
         }
 
         $validator = Validator::make($request->all(), [
-            'title' => 'sometimes|string',
-            'location' => 'sometimes|string',
+            'title' => 'sometimes|string|max:255',
+            'location' => 'sometimes|string|max:100',
             'description' => 'sometimes|string',
-            'skills' => 'sometimes|string',
+            'skills' => 'array',
+            'skills.*' => 'string',
+            'min_salary' => 'nullable|integer|min:0',
+            'max_salary' => 'nullable|integer|min:0|gt:min_salary',
+            'salary_negotiable' => 'nullable|boolean',
+            'payment_period' => 'nullable|in:hourly,daily,weekly,monthly,yearly',
+            'payment_currency' => 'nullable|string|size:3',
+            'hiring_multiple_candidates' => 'nullable|boolean',
         ]);
 
         if ($validator->fails()) {
@@ -103,7 +143,10 @@ class JobListController extends Controller
             ], 422);
         }
 
-        $job->update($request->all());
+        $data = $request->all();
+
+
+        $job->update($data);
 
         return response()->json([
             'status' => true,

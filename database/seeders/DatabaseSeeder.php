@@ -47,19 +47,6 @@ class DatabaseSeeder extends Seeder
             'password' => Hash::make('c'),
         ])->assignRole($companyRole);
 
-        User::factory()->count(25)->userRole()->create();
-        User::factory()
-            ->count(25)
-            ->companyRole()
-            ->afterCreating(function ($user) {
-                JobList::factory()
-                    ->count(3)
-                    ->create([
-                        'user_id' => $user->id
-                    ]);
-            })
-            ->create();
-
 
     }
 }
