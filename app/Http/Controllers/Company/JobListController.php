@@ -14,7 +14,7 @@ class JobListController extends Controller
     public function index(Request $request)
     {
         // Validate the per_page parameter
-        $validator = Validator::make($request->all(), [
+        $validator = Validator::make($request->query(), [
             'per_page' => 'nullable|integer|min:1|max:100',
             'search' => 'nullable|string|max:255'
         ]);
@@ -26,8 +26,8 @@ class JobListController extends Controller
             ], 422);
         }
 
-        $perPage = $request->per_page ?? 10; // Default to 10 if not provided
-        $search = $request->search ?? '';
+        $perPage = $request->query('per_page', 10); // Default to 10 if not provided
+        $search = $request->query('search', '');
 
         // Get paginated jobs with user relationship and search
         $jobs = JobList::with('user')

@@ -13,7 +13,7 @@ class UserController extends Controller
 
     public function getUsers(Request $request)
     {
-        $validator = Validator::make($request->all(), [
+        $validator = Validator::make($request->query(), [
             'per_page' => 'nullable|integer|min:1|max:250',
             'search' => 'nullable|string|max:255'
         ]);
@@ -25,8 +25,8 @@ class UserController extends Controller
             ], 422);
         }
 
-        $perPage = $request->per_page ?? 10;
-        $search = $request->search ?? '';
+        $perPage = $request->query('per_page', 10);
+        $search = $request->query('search', '');
 
         $users = User::role('user')->with('jobs')
             ->when($search !== '', function ($query) use ($search) {
@@ -42,7 +42,7 @@ class UserController extends Controller
 
     public function getCompanies(Request $request)
     {
-        $validator = Validator::make($request->all(), [
+        $validator = Validator::make($request->query(), [
             'per_page' => 'nullable|integer|min:1|max:250',
             'search' => 'nullable|string|max:255'
         ]);
@@ -54,8 +54,8 @@ class UserController extends Controller
             ], 422);
         }
 
-        $perPage = $request->per_page ?? 10;
-        $search = $request->search ?? '';
+        $perPage = $request->query('per_page', 10);
+        $search = $request->query('search', '');
 
         $companies = User::role('company')
             ->when($search !== '', function ($query) use ($search) {
