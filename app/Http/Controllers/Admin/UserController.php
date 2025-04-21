@@ -28,7 +28,7 @@ class UserController extends Controller
         $perPage = $request->per_page ?? 10;
         $search = $request->search ?? '';
 
-        $users = User::role('user')
+        $users = User::role('user')->with('jobs')
             ->when($search !== '', function ($query) use ($search) {
                 $query->where(DB::raw("CONCAT(first_name, ' ', last_name)"), 'like', "%{$search}%");
             })
@@ -103,6 +103,7 @@ class UserController extends Controller
                 'image_url'       => $user->image_url,
                 'background_url'  => $user->background_url,
                 'description'     => $user->description,
+                'location'     => $user->location,
                 'cv'              => $user->cv,
                 'skills'          => $user->skills ?? [],
                 'job'             => $user->jobs[0] ?? null,
@@ -140,6 +141,7 @@ class UserController extends Controller
                 'image_url' => $company->image_url,
                 'background_url' => $company->background_url,
                 'description'     => $company->description,
+                'location'     => $company->location,
                 'cv' => $company->cv,
                 'jobs' => $company->JobList
             ],
