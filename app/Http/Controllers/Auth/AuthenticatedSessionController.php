@@ -27,7 +27,6 @@ class AuthenticatedSessionController extends Controller
 
             // If authentication passes, proceed to token creation
             $user = $request->user();
-            $user->tokens()->delete(); // Delete existing tokens if any
 
             // Create a new token
             $token = $user->createToken('auth_token')->plainTextToken;
