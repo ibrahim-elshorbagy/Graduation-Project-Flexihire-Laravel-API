@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\Models\Auth\OurJob;
 use App\Models\Auth\Skill;
+use App\Models\User\JobApply;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -74,9 +75,15 @@ class User extends Authenticatable
         return $this->belongsToMany(OurJob::class, 'user_job_title', 'user_id', 'our_jobs_title_id');
     }
 
+    // for company to show it's jobs
     public function JobList()
     {
         return $this->hasMany(JobList::class);
     }
 
+    // for user to show his jobs
+    public function JobApply()
+    {
+        return $this->hasMany(JobApply::class);
+    }
 }

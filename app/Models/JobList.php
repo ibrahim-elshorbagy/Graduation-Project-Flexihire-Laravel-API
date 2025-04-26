@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\User\JobApply;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -22,4 +23,8 @@ class JobList extends Model
         'salary_negotiable' => 'boolean',
         'hiring_multiple_candidates' => 'boolean',
     ];
+    public function applies()
+    {
+        return $this->hasMany(JobApply::class, 'job_id');
+    }
 }

@@ -106,8 +106,25 @@ class JobListController extends Controller
             ], 404);
         }
 
-        return response()->json(['job' => $job]);
+        $response = [
+            'status' => true,
+            'job' => $job,
+            'has_applied' => false
+        ];
+
+        // Check if token is valid
+        $user = Auth::guard('sanctum')->user();
+
+        if ($user) {
+            $hasApplied = \App\Models\User\JobApply::where('user_id', $user->id)
+                ->where('job_id', $id)
+                ->exists();
+            $response['has_applied'] = $hasApplied;
+        }
+
+        return response()->json($response);
     }
+
 
     public function update(Request $request, $id)
     {

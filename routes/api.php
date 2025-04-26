@@ -11,7 +11,9 @@ use App\Http\Controllers\Auth\NewPasswordController;
 
 use App\Http\Controllers\Auth\SignUpWith\GoogleContoller;
 use App\Http\Controllers\Company\JobListController;
+use App\Http\Controllers\Company\MyJobsController;
 use App\Http\Controllers\Profile\ProfileController;
+use \App\Http\Controllers\User\Jobs\JobApplyController;
 
 
 //------------------------------ Login system -----------------------------------------//
@@ -73,7 +75,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
 //------------------------------ Anyone company -----------------------------------------//
 
     Route::get('/all-jobs', [JobListController::class, 'index']);
+
     Route::get('/company/get-job/{id}', [JobListController::class, 'show']);
+
 
 
 //------------------------------ Only company -----------------------------------------//
@@ -82,6 +86,18 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('/company/create-job', [JobListController::class, 'store']);
         Route::post('/company/update-job/{id}', [JobListController::class, 'update']);
         Route::post('/company/delete-job/{id}', [JobListController::class, 'destroy']);
+
+        Route::get('/dashboard/company/my-jobs/', [MyJobsController::class, 'myJobs']);
+        Route::get('/dashboard/company/my-job-proposals/{id}', [MyJobsController::class, 'myJobProposals']);
+
+    });
+
+    //------------------------------ Only User -----------------------------------------//
+
+    Route::middleware(['auth:sanctum', 'role:user'])->group(function () {
+
+        Route::post('/dashboard/company/apply-for-job', [JobApplyController::class, 'store']);
+        Route::get('/dashboard/user/my-applies/', [JobApplyController::class, 'myProposals']);
 
     });
 
