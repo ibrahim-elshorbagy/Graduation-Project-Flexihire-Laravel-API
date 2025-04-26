@@ -97,14 +97,19 @@ class JobListController extends Controller
 
     public function show($id)
     {
-        $job = JobList::with('user')->find($id);
+        $validator = Validator::make(['id' => $id], [
+            'id' => 'required|integer|exists:job_lists,id'
+        ]);
 
-        if (!$job) {
+        // Check if validation fails
+        if ($validator->fails()) {
             return response()->json([
-                'status' => false,
-                'message' => 'JobList not found'
-            ], 404);
+                'message' => 'Invalid job ID',
+                'errors' => $validator->errors(),
+            ], 422);
         }
+
+        $job = JobList::with('user')->find($id);
 
         $response = [
             'status' => true,
@@ -128,14 +133,20 @@ class JobListController extends Controller
 
     public function update(Request $request, $id)
     {
+        $validator = Validator::make(['id' => $id], [
+            'id' => 'required|integer|exists:job_lists,id'
+        ]);
+
+        // Check if validation fails
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Invalid job ID',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
         $job = JobList::find($id);
 
-        if (!$job) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Job not found'
-            ], 404);
-        }
 
         if ($job->user_id !== auth()->id()) {
             return response()->json([
@@ -180,14 +191,19 @@ class JobListController extends Controller
 
     public function destroy($id)
     {
-        $job = JobList::find($id);
+        $validator = Validator::make(['id' => $id], [
+            'id' => 'required|integer|exists:job_lists,id'
+        ]);
 
-        if (!$job) {
+        // Check if validation fails
+        if ($validator->fails()) {
             return response()->json([
-                'status' => false,
-                'message' => 'Job not found'
-            ], 404);
+                'message' => 'Invalid job ID',
+                'errors' => $validator->errors(),
+            ], 422);
         }
+
+        $job = JobList::find($id);
 
         if ($job->user_id !== auth()->id()) {
             return response()->json([
