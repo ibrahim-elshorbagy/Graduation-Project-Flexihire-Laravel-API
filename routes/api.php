@@ -89,6 +89,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
         Route::get('/dashboard/company/my-jobs/', [MyJobsController::class, 'myJobs']);
         Route::get('/dashboard/company/my-job-proposals/{id}', [MyJobsController::class, 'myJobProposals']);
+        Route::post('/dashboard/company/update-application-status/{id}', [MyJobsController::class, 'updateApplicationStatus']);
 
     });
 

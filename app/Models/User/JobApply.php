@@ -12,6 +12,10 @@ class JobApply extends Model
     use HasFactory;
     protected $guarded = ['id'];
 
+    const STATUS_PENDING = 'pending';
+    const STATUS_APPROVED = 'approved';
+    const STATUS_REJECTED = 'rejected';
+
     public $timestamps = false;
 
     public function user()

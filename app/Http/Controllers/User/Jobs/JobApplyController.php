@@ -45,6 +45,7 @@ class JobApplyController extends Controller
             $jobApply = $job->applies()->create([
                 'user_id' => Auth::id(),
                 'proposal' => $request->proposal,
+                'status' => JobApply::STATUS_PENDING,
                 'created_at'=>now()
             ]);
 
@@ -68,7 +69,7 @@ class JobApplyController extends Controller
         try {
             $proposals = JobApply::with('job.user')
             ->where('user_id', Auth::id())
-            ->select('id', 'job_id', 'proposal', 'created_at')
+            ->select('id', 'job_id', 'proposal', 'status', 'created_at')
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
@@ -81,7 +82,8 @@ class JobApplyController extends Controller
                         'job' => $proposal->job,
                         'company' => $proposal->job->user,
                         'proposal_date' => $proposal->created_at,
-                        'proposal' => $proposal->proposal
+                        'proposal' => $proposal->proposal,
+                        'status' => $proposal->status
                     ];
                 })
             ]);
