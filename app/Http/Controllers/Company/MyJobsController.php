@@ -62,8 +62,7 @@ class MyJobsController extends Controller
     public function myJobs()
     {
 
-        $jobs = JobList::select('id', 'title', 'date_posted')
-            ->where('user_id', Auth::id())
+        $jobs = JobList::where('user_id', Auth::id())
             ->withCount('applies as applications_count')
             ->orderBy('date_posted', 'desc')
             ->paginate(10);
