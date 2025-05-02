@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simple Chat</title>
+  <script src="https://js.pusher.com/8.4.0/pusher.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-4">
+  <div class="max-w-2xl mx-auto bg-white rounded shadow-md p-6">
+    <!-- Setup Section -->
+    <div class="mb-6">
+      <div class="grid grid-cols-1 gap-4">
+        <div>
+          <label class="block mb-1">Your Token:</label>
+          <input type="text" id="token" class="w-full p-2 border rounded" placeholder="Enter your token">
+        </div>
+        <div>
+          <label class="block mb-1">Your User ID:</label>
+          <input type="number" id="currentUserId" class="w-full p-2 border rounded" placeholder="Enter your user ID">
+        </div>
+        <div>
+          <label class="block mb-1">Chat with User ID:</label>
+          <input type="number" id="receiverId" class="w-full p-2 border rounded" placeholder="Enter recipient ID">
+        </div>
+        <div>
+          <button id="connectBtn" class="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600">Start Chat</button>
+        </div>
+      </div>
+      <div id="status" class="mt-3 p-2 rounded hidden"></div>
+    </div>
+
+    <!-- Chat Section -->
+    <div id="chatSection" class="hidden">
+      <h2 class="text-xl font-bold mb-4">Chat with User <span id="receiverDisplay"></span></h2>
+      <div id="messages" class="h-80 overflow-y-auto p-4 border rounded mb-4 bg-gray-50"></div>
+      <form id="messageForm" class="flex gap-2">
+        <input type="text" id="messageInput" class="flex-1 p-2 border rounded" placeholder="Type a message...">
+        <button type="submit" id="sendBtn" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Send</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    const tokenInput = document.getElementById('token');
+    const receiverIdInput = document.getElementById('receiverId');
+    const connectBtn = document.getElementById('connectBtn');
+    const statusEl = document.getElementById('status'); //connection status
+    const chatSection = document.getElementById('chatSection');
+    const receiverDisplay = document.getElementById('receiverDisplay');
+    const messagesContainer = document.getElementById('messages');
+    const messageInput = document.getElementById('messageInput');
+    const sendBtn = document.getElementById('sendBtn');
+
+    let currentUser = null;
+    let selectedUserId = null;
+    let pusher = null;
+    let channel = null;
+
+
+
+    // Load saved values from localStorage
+    if (localStorage.getItem('chatToken')) {
+      tokenInput.value = localStorage.getItem('chatToken');
+    }
+    if (localStorage.getItem('currentUserId')) {
+      document.getElementById('currentUserId').value = localStorage.getItem('currentUserId');
+    }
+    if (localStorage.getItem('receiverId')) {
+      receiverIdInput.value = localStorage.getItem('receiverId');
+    }
+
+    function showStatus(message, isError = false) {
+      statusEl.textContent = message;
+      statusEl.classList.remove('hidden', 'bg-green-100', 'text-green-800', 'bg-red-100', 'text-red-800');
+      statusEl.classList.add(...(isError ? ['bg-red-100', 'text-red-800'] : ['bg-green-100', 'text-green-800']));
+    }
+
+    function initPusher(token) {
+      if (pusher) pusher.disconnect();
+        Pusher.logToConsole = true;
+
+      pusher = new Pusher('1592f4180794c697061f', {
+        cluster: 'eu',
+        authEndpoint: 'https://c.jordanwebmaster.com/flexihire/public/api/broadcasting/auth',
+        auth: {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: 'application/json'
+          }
+        },
+        encrypted: true
+      });
+
+      pusher.connection.bind('connected', () => {
+        showStatus('Connected to chat service');
+        subscribeToChannel();
+      });
+
+      pusher.connection.bind('error', err => {
+        const errorMsg = err?.message || JSON.stringify(err) || 'Unknown error';
+        showStatus(`Connection error: ${errorMsg}`, true);
+      });
+    }
+
+    function subscribeToChannel() {
+        // Please Don't change this part Don't touch it copy and pase it
+        // This Ensure the chat will always be the same name for the both users who chatting togther
+        const user1 = Math.min(currentUser.id, selectedUserId);
+        const user2 = Math.max(currentUser.id, selectedUserId);
+        const channelName = `chat.${user1}-${user2}`;
+
+        channel = pusher.subscribe(channelName);
+
+
+      //If Succeeded
+      channel.bind('pusher:subscription_succeeded', () => {
+        showStatus('Subscribed to channel');
+      });
+
+      //If Error
+      channel.bind('pusher:subscription_error', error => {
+        const errorMsg = error?.message || error?.error || JSON.stringify(error) || 'Unknown error';
+        showStatus(`Failed to connect: ${errorMsg}`, true);
+      });
+
+
+      //This is the real time function
+      //when a user send a meessage external live server will sent the message here so you will just append the meessage to the view Nothing elase
+      //just append the meesage to the frontend
+      channel.bind('new.message', data => { // You will receive data contine the message from other man who sent the message
+        if (selectedUserId === data.from_id) { //This means If the one we talk to him (selectedUserId)  is the same is the one come from the response data (data.from_id)
+          appendMessage(data.message, false, data.from, new Date(data.timestamp));
+        }
+      });
+
+    }
+
+    //Works
+    function appendMessage(text, isMine, sender, timestamp) {
+      const msgEl = document.createElement('div');
+      msgEl.classList.add(
+        'mb-3',
+        'p-3',
+        'rounded',
+        ...(isMine ? ['ml-auto', 'bg-blue-100', 'text-blue-800'] : ['bg-gray-200']),
+        'max-w-3/4'
+      );
+
+      const nameSpan = document.createElement('div');
+      nameSpan.classList.add('font-bold', 'text-xs', 'mb-1');
+      nameSpan.textContent = isMine ? 'You' : sender;
+
+      const textSpan = document.createElement('div');
+      textSpan.textContent = text;
+
+      const timeSpan = document.createElement('div');
+      timeSpan.classList.add('text-xs', 'text-gray-500', 'mt-1');
+      timeSpan.textContent = timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+      msgEl.appendChild(nameSpan);
+      msgEl.appendChild(textSpan);
+      msgEl.appendChild(timeSpan);
+
+      messagesContainer.appendChild(msgEl);
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+
+    async function sendMessage() {
+      const message = messageInput.value.trim();
+      if (!message || !selectedUserId) return;
+
+      messageInput.disabled = true;
+      sendBtn.disabled = true;
+
+      try {
+        const messageText = message;
+        messageInput.value = '';
+
+        const response = await fetch(`https://c.jordanwebmaster.com/flexihire/public/api/chat/send-chat/${selectedUserId}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${tokenInput.value}`,
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify({
+            to_user_id: selectedUserId,
+            message: messageText
+          })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok || !data.status) {
+          throw new Error(data.message || `HTTP error ${response.status}`);
+        }
+
+        appendMessage(messageText, true, 'You', new Date());
+      } catch (error) {
+        messageInput.value = message; // Restore message on error
+        showStatus(`Failed to send: ${error.message}`, true);
+      } finally {
+        messageInput.disabled = false;
+        sendBtn.disabled = false;
+        messageInput.focus();
+      }
+    }
+
+    connectBtn.addEventListener('click', () => {
+      const token = tokenInput.value.trim();
+      const userId = parseInt(document.getElementById('currentUserId').value);
+      const receiverId = parseInt(receiverIdInput.value);
+
+      if (!token || !userId || !receiverId) {
+        showStatus('Please enter your token, your user ID, and recipient ID', true);
+        return;
+      }
+
+      currentUser = { id: userId };
+
+      // Save all values to localStorage
+      localStorage.setItem('chatToken', token);
+      localStorage.setItem('currentUserId', userId);
+      localStorage.setItem('receiverId', receiverId);
+      selectedUserId = receiverId;
+      receiverDisplay.textContent = receiverId;
+      initPusher(token);
+      chatSection.classList.remove('hidden');
+      messagesContainer.innerHTML = '';
+      messageInput.focus();
+    });
+
+    messageInput.addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        sendMessage();
+      }
+    });
+    document.getElementById('messageForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+        sendMessage();
+    });
+
+});
+  </script>
+</body>
+</html>

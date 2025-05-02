@@ -34,8 +34,8 @@ class ChatController extends Controller
                         'first_name' => $contact->last_name,
                         'last_name' => $contact->last_name,
                         'image' => $contact->image_url,
-                        'last_message' => $lastMessage->message,
-                        'timestamp' => $lastMessage->created_at,
+                        // 'last_message' => $lastMessage->message,
+                        // 'timestamp' => $lastMessage->created_at,
                     ];
                 })
                 ->values();
@@ -69,6 +69,15 @@ class ChatController extends Controller
             }
 
         $user = Auth::user();
+
+        //  Block user from accessing chat with themselves
+        if ($user->id == $id) {
+            return response()->json([
+                'status' => false,
+                'message' => "You can't chat with yourself."
+            ], 403);
+        }
+
         $messages = Message::where(function($query) use ($user, $id) {
                 $query->where('sender_id', $user->id)
                       ->where('receiver_id', $id);
@@ -91,7 +100,7 @@ class ChatController extends Controller
                         'last_name' => $message->sender->last_name,
                         'image' => $message->sender->image_url
                     ],
-                    'timestamp' => $message->created_at
+                    'sent_at' => $message->created_at
                 ];
             });
 
