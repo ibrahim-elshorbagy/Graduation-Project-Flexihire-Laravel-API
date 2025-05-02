@@ -10,11 +10,12 @@ use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\NewPasswordController;
 
 use App\Http\Controllers\Auth\SignUpWith\GoogleContoller;
+use App\Http\Controllers\ChatSystem\ChatController;
 use App\Http\Controllers\Company\JobListController;
 use App\Http\Controllers\Company\MyJobsController;
 use App\Http\Controllers\Profile\ProfileController;
 use \App\Http\Controllers\User\Jobs\JobApplyController;
-
+use Illuminate\Support\Facades\Broadcast;
 
 //------------------------------ Login system -----------------------------------------//
 
@@ -101,6 +102,20 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/dashboard/user/my-applies/', [JobApplyController::class, 'myProposals']);
 
     });
+
+    //------------------------------ Chat -----------------------------------------//
+
+
+
+    Route::middleware(['auth:sanctum'])->group(function () {
+
+        Route::get('/chat/contacts/', [ChatController::class, 'getContacts']);
+        Route::get('/chat/get-chat/{id}/', [ChatController::class, 'getChat']);
+        Route::post('/chat/send-chat/{id}/', [ChatController::class, 'SendChat']);
+
+    });
+
+    Broadcast::routes(['middleware' => ['auth:sanctum']]);
 
 // Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
 //     return $request->user();

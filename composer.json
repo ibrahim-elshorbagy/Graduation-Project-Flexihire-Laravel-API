@@ -13,6 +13,7 @@
         "laravel/sanctum": "^4.0",
         "laravel/socialite": "^5.15",
         "laravel/tinker": "^2.9",
+        "pusher/pusher-php-server": "^7.2",
         "spatie/laravel-permission": "^6.9",
         "spatie/laravel-sluggable": "^3.6"
     },
