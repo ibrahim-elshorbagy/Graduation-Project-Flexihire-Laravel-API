@@ -31,7 +31,7 @@ class ChatController extends Controller
                     $contact = $lastMessage->sender_id === $user->id ? $lastMessage->receiver : $lastMessage->sender;
                     return [
                         'id' => $contact->id,
-                        'first_name' => $contact->last_name,
+                        'first_name' => $contact->first_name,
                         'last_name' => $contact->last_name,
                         'image' => $contact->image_url,
                         // 'last_message' => $lastMessage->message,
@@ -168,7 +168,7 @@ class ChatController extends Controller
                     'sender' => [
                         'id' => $user->id,
                         'first_name' => $user->first_name,
-                        'last_name' => $user->first_name,
+                        'last_name' => $user->last_name,
                         'image' => $user->image_url
                     ],
                     'timestamp' => $message->created_at
