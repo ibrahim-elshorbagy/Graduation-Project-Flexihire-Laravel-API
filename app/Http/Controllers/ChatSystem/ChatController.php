@@ -167,7 +167,8 @@ class ChatController extends Controller
                     'message' => $message->message,
                     'sender' => [
                         'id' => $user->id,
-                        'name' => $user->first_name . ' ' . $user->last_name,
+                        'first_name' => $user->first_name,
+                        'last_name' => $user->first_name,
                         'image' => $user->image_url
                     ],
                     'timestamp' => $message->created_at

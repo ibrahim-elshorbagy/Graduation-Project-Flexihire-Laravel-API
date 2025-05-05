@@ -131,16 +131,18 @@ document.addEventListener('DOMContentLoaded', () => {
       //This is the real time function
       //when a user send a meessage external live server will sent the message here so you will just append the meessage to the view Nothing elase
       //just append the meesage to the frontend
-      channel.bind('new.message', data => { // You will receive data contine the message from other man who sent the message
+      channel.bind('new.message', data =>
+
+      { // You will receive data contine the message from other man who sent the message
         if (selectedUserId === data.from_id) { //This means If the one we talk to him (selectedUserId)  is the same is the one come from the response data (data.from_id)
-          appendMessage(data.message, false, data.from, new Date(data.timestamp));
+          appendMessage(data.message, false, data.first_name,data.last_name, new Date(data.timestamp));
         }
       });
 
     }
 
     //Works
-    function appendMessage(text, isMine, sender, timestamp) {
+    function appendMessage(text, isMine, sender_first_name,sender_last_name, timestamp) {
       const msgEl = document.createElement('div');
       msgEl.classList.add(
         'mb-3',
@@ -152,7 +154,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const nameSpan = document.createElement('div');
       nameSpan.classList.add('font-bold', 'text-xs', 'mb-1');
-      nameSpan.textContent = isMine ? 'You' : sender;
+      nameSpan.textContent = isMine ? 'You' : `${sender_first_name} ${sender_last_name}`;
+
 
       const textSpan = document.createElement('div');
       textSpan.textContent = text;
@@ -188,7 +191,6 @@ document.addEventListener('DOMContentLoaded', () => {
             'Accept': 'application/json'
           },
           body: JSON.stringify({
-            to_user_id: selectedUserId,
             message: messageText
           })
         });
@@ -199,7 +201,7 @@ document.addEventListener('DOMContentLoaded', () => {
           throw new Error(data.message || `HTTP error ${response.status}`);
         }
 
-        appendMessage(messageText, true, 'You', new Date());
+        appendMessage(messageText, true, 'You','', new Date());
       } catch (error) {
         messageInput.value = message; // Restore message on error
         showStatus(`Failed to send: ${error.message}`, true);

@@ -50,7 +50,9 @@ class ChatNotification extends Notification implements ShouldBroadcastNow
         $timestamp = now();
         return [
             'message' => $this->message,
-            'from' => $this->fromUser->first_name . ' ' . $this->fromUser->last_name,
+            'first_name' => $this->fromUser->first_name,
+            'last_name' => $this->fromUser->last_name,
+            'image' => $this->fromUser->image_url,
             'from_id' => $this->fromUser->id,
             'timestamp' => $timestamp->toIso8601String(), // Use ISO 8601 format for better timestamp handling
         ];
