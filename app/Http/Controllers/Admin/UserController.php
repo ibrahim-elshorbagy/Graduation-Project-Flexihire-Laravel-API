@@ -15,7 +15,8 @@ class UserController extends Controller
     {
         $validator = Validator::make($request->query(), [
             'per_page' => 'nullable|integer|min:1|max:250',
-            'search' => 'nullable|string|max:255'
+            'search' => 'nullable|string|max:255',
+            'jobSearch' => 'nullable|string|max:255'
         ]);
 
         if ($validator->fails()) {
@@ -27,10 +28,16 @@ class UserController extends Controller
 
         $perPage = $request->query('per_page', 10);
         $search = $request->query('search', '');
+        $jobSearch = $request->query('jobSearch', '');
 
         $users = User::role('user')->with('jobs')
             ->when($search !== '', function ($query) use ($search) {
                 $query->where(DB::raw("CONCAT(first_name, ' ', last_name)"), 'like', "%{$search}%");
+            })
+            ->when($jobSearch!== '', function ($query) use ($jobSearch) {
+                $query->whereHas('jobs', function ($query) use ($jobSearch) {
+                    $query->where('name', 'like', "%{$jobSearch}%");
+                });
             })
             ->paginate($perPage);
 
@@ -44,7 +51,8 @@ class UserController extends Controller
     {
         $validator = Validator::make($request->query(), [
             'per_page' => 'nullable|integer|min:1|max:250',
-            'search' => 'nullable|string|max:255'
+            'search' => 'nullable|string|max:255',
+            'searchLocation' => 'nullable|string|max:255'
         ]);
 
         if ($validator->fails()) {
@@ -56,10 +64,14 @@ class UserController extends Controller
 
         $perPage = $request->query('per_page', 10);
         $search = $request->query('search', '');
+        $searchLocation = $request->query('searchLocation', '');
 
         $companies = User::role('company')
             ->when($search !== '', function ($query) use ($search) {
                 $query->where(DB::raw("CONCAT(first_name, ' ', last_name)"), 'like', "%{$search}%");
+            })
+            ->when($searchLocation !== '', function ($query) use ($searchLocation) {
+                $query->where('location',$searchLocation);
             })
             ->paginate($perPage);
 

@@ -34,6 +34,7 @@ class ChatController extends Controller
                         'first_name' => $contact->first_name,
                         'last_name' => $contact->last_name,
                         'image' => $contact->image_url,
+                        'type' => $contact->roles[0]['name'],
                         // 'last_message' => $lastMessage->message,
                         // 'timestamp' => $lastMessage->created_at,
                     ];

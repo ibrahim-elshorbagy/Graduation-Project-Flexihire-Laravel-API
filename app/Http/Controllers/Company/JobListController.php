@@ -13,10 +13,13 @@ class JobListController extends Controller
 
     public function index(Request $request)
     {
-        // Validate the per_page parameter
         $validator = Validator::make($request->query(), [
             'per_page' => 'nullable|integer|min:1|max:100',
-            'search' => 'nullable|string|max:255'
+            'search' => 'nullable|string|max:255',
+            'searchLocation' => 'nullable|string|max:100',
+            'minSalary' => 'nullable|integer|min:0',
+            'maxSalary' => 'nullable|integer|min:0',
+            'skills' => 'nullable|array|max:255',
         ]);
 
         if ($validator->fails()) {
@@ -26,13 +29,28 @@ class JobListController extends Controller
             ], 422);
         }
 
-        $perPage = $request->query('per_page', 10); // Default to 10 if not provided
+        $perPage = $request->query('per_page', 10);
         $search = $request->query('search', '');
+        $searchLocation = $request->query('searchLocation', '');
+        $minSalary = $request->query('minSalary');
+        $maxSalary = $request->query('maxSalary');
+        $skills = $request->query('skills', '');
 
-        // Get paginated jobs with user relationship and search
         $jobs = JobList::with('user')
             ->when($search !== '', function ($query) use ($search) {
                 $query->where('title', 'like', "%{$search}%");
+            })
+            ->when($searchLocation !== '', function ($query) use ($searchLocation) {
+                $query->where('location', 'like', "%{$searchLocation}%");
+            })
+            ->when($skills !== '', function ($query) use ($skills) {
+                $query->whereJsonContains('skills', $skills);
+            })
+            ->when(!is_null($minSalary), function ($query) use ($minSalary) {
+                $query->where('min_salary', '>=', $minSalary);
+            })
+            ->when(!is_null($maxSalary), function ($query) use ($maxSalary) {
+                $query->where('max_salary', '<=', $maxSalary);
             })
             ->paginate($perPage);
 
@@ -41,6 +59,8 @@ class JobListController extends Controller
             'data' => $jobs,
         ]);
     }
+
+
 
     public function store(Request $request)
     {
