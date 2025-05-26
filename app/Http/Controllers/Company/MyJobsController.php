@@ -33,7 +33,7 @@ class MyJobsController extends Controller
             $jobApply = JobApply::findOrFail($id);
 
             // Check if the job belongs to the authenticated company
-            if ($jobApply->job->user_id !== Auth::id()) {
+            if ( (int)$jobApply->job->user_id !==  (int)Auth::id()) {
                 return response()->json([
                     'status' => false,
                     'message' => 'Unauthorized to update this application'
@@ -92,7 +92,7 @@ class MyJobsController extends Controller
             ->where('user_id', Auth::id())
             ->firstOrFail();
 
-        if ($job->user_id !== auth()->id()) {
+        if ( (int)$job->user_id !== (int)auth()->id()) {
             return response()->json([
                 'status' => false,
                 'message' => 'Unauthorized to see this proposals'

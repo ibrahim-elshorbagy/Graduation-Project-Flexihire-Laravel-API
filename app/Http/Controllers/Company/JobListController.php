@@ -168,7 +168,7 @@ class JobListController extends Controller
         $job = JobList::find($id);
 
 
-        if ($job->user_id !== auth()->id()) {
+        if ((int)$job->user_id !==  (int)auth()->id()) {
             return response()->json([
                 'status' => false,
                 'message' => 'Unauthorized to update this job'
@@ -225,7 +225,7 @@ class JobListController extends Controller
 
         $job = JobList::find($id);
 
-        if ($job->user_id !== auth()->id()) {
+        if ((int)$job->user_id !==  (int)auth()->id()) {
             return response()->json([
                 'status' => false,
                 'message' => 'Unauthorized to delete this job'
