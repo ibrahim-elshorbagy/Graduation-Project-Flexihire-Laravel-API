@@ -129,7 +129,7 @@ class JobListController extends Controller
             ], 422);
         }
 
-        $job = JobList::with('user')->find($id);
+        $job = JobList::with('user')->find( (int) $id);
 
         $response = [
             'status' => true,
@@ -142,7 +142,7 @@ class JobListController extends Controller
 
         if ($user) {
             $hasApplied = \App\Models\User\JobApply::where('user_id', $user->id)
-                ->where('job_id', $id)
+                ->where('job_id', (int) $id)
                 ->exists();
             $response['has_applied'] = $hasApplied;
         }
@@ -223,7 +223,7 @@ class JobListController extends Controller
             ], 422);
         }
 
-        $job = JobList::find($id);
+        $job = JobList::find((int) $id);
 
         if ((int)$job->user_id !==  (int)auth()->id()) {
             return response()->json([

@@ -19,16 +19,16 @@ class ChatController extends Controller
             $user = Auth::user();
 
             $messages = Message::where('sender_id', $user->id)
-                ->orWhere('receiver_id', $user->id)
+                ->orWhere('receiver_id', (int) $user->id)
                 ->with(['sender:id,first_name,last_name,image_url', 'receiver:id,first_name,last_name,image_url'])
                 ->orderBy('created_at', 'desc')
                 ->get()
                 ->groupBy(function($message) use ($user) {
-                    return $message->sender_id === $user->id ? $message->receiver_id : $message->sender_id;
+                    return (int) $message->sender_id === (int) $user->id ? (int) $message->receiver_id : (int) $message->sender_id;
                 })
                 ->map(function($messages) use ($user) {
                     $lastMessage = $messages->first();
-                    $contact = $lastMessage->sender_id === $user->id ? $lastMessage->receiver : $lastMessage->sender;
+                    $contact =  (int) $lastMessage->sender_id === (int) $user->id ? $lastMessage->receiver : $lastMessage->sender;
                     return [
                         'id' => $contact->id,
                         'first_name' => $contact->first_name,
@@ -72,19 +72,19 @@ class ChatController extends Controller
         $user = Auth::user();
 
         //  Block user from accessing chat with themselves
-        if ($user->id == $id) {
-            return response()->json([
-                'status' => false,
-                'message' => "You can't chat with yourself."
-            ], 403);
-        }
+        // if ($user->id == $id) {
+        //     return response()->json([
+        //         'status' => false,
+        //         'message' => "You can't chat with yourself."
+        //     ], 403);
+        // }
 
         $messages = Message::where(function($query) use ($user, $id) {
                 $query->where('sender_id', $user->id)
-                      ->where('receiver_id', $id);
+                      ->where('receiver_id', (int) $id);
             })
             ->orWhere(function($query) use ($user, $id) {
-                $query->where('sender_id', $id)
+                $query->where('sender_id', (int) $id)
                       ->where('receiver_id', $user->id);
             })
             ->with(['sender:id,first_name,last_name,image_url'])
@@ -94,9 +94,9 @@ class ChatController extends Controller
                 return [
                     'id' => $message->id,
                     'message' => $message->message,
-                    'is_mine' => $message->sender_id === $user->id,
+                    'is_mine' => (int) $message->sender_id === (int) $user->id,
                     'sender' => [
-                        'id' => $message->sender->id,
+                        'id' => (int) $message->sender->id,
                         'first_name' => $message->sender->first_name,
                         'last_name' => $message->sender->last_name,
                         'image' => $message->sender->image_url
@@ -139,26 +139,27 @@ class ChatController extends Controller
         $user = Auth::user();
 
         // Prevent sending a message to yourself
-        if ($user->id == $id) {
-            return response()->json([
-                'status' => false,
-                'message' => "You can't chat with yourself."
-            ], 403);
-        }
+        // if ($user->id == $id) {
+        //     return response()->json([
+        //         'status' => false,
+        //         'message' => "You can't chat with yourself."
+        //     ], 403);
+        // }
+
 
         try {
             // Create and save the message
             $message = Message::create([
                 'sender_id' => $user->id,
-                'receiver_id' => $id,
+                'receiver_id' => (int)$id,
                 'message' => $request->message
             ]);
 
             // Send real-time notification
-            $receiver = User::find($id);
+            $receiver = User::find((int) $id);
 
 
-            $receiver->notify(new ChatNotification($request->message, $user, $id));
+            $receiver->notify(new ChatNotification($request->message, $user, (int)$id));
 
             return response()->json([
                 'status' => true,

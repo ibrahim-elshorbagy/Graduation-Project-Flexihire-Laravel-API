@@ -30,7 +30,7 @@ class MyJobsController extends Controller
                 ], 422);
             }
 
-            $jobApply = JobApply::findOrFail($id);
+            $jobApply = JobApply::findOrFail((int) $id);
 
             // Check if the job belongs to the authenticated company
             if ( (int)$jobApply->job->user_id !==  (int)Auth::id()) {
@@ -88,7 +88,7 @@ class MyJobsController extends Controller
             ], 422);
         }
 
-        $job = JobList::where('id', $id)
+        $job = JobList::where('id', (int)$id)
             ->where('user_id', Auth::id())
             ->firstOrFail();
 
