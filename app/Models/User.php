@@ -95,4 +95,12 @@ class User extends Authenticatable
         return $this->belongsToMany(JobList::class, 'saved_job_lists', 'user_id', 'job_id')
                     ->withTimestamps();
     }
+
+    /**
+     * Get the job applications for the user.
+     */
+    public function jobApplications()
+    {
+        return $this->hasMany(\App\Models\User\JobApply::class);
+    }
 }

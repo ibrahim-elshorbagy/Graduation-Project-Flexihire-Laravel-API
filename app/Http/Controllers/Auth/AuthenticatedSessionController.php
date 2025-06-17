@@ -21,12 +21,15 @@ class AuthenticatedSessionController extends Controller
      */
     public function store(LoginRequest $request)
     {
-
+        try {
             // Attempt to authenticate using the LoginRequest
             $request->authenticate();
 
             // If authentication passes, proceed to token creation
             $user = $request->user();
+
+            // Get the count of job applications
+            $jobApplicationsCount = $user->jobApplications()->count();
 
             // Create a new token
             $token = $user->createToken('auth_token')->plainTextToken;
@@ -48,18 +51,16 @@ class AuthenticatedSessionController extends Controller
                     'permissions'=>$permissions,
                     'skills' => $user->skills ?? [],
                     'job' => $user->jobs[0] ?? '',
-
+                    'applied_jobs_count' => $jobApplicationsCount,
                 ],
                 'token' => $token,
                 'token_type' => 'Bearer',
             ]);
-        try {
         } catch (AuthenticationException $e) {
             return response()->json([
                 'status' => false,
                 'message' => 'Invalid credentials.',
             ], 401);
-
         }
         catch (\Throwable $th) {
             // Handle other unexpected errors

@@ -30,7 +30,9 @@ class UserController extends Controller
         $search = $request->query('search', '');
         $jobSearch = $request->query('jobSearch', '');
 
-        $users = User::role('user')->with('jobs')
+        $users = User::role('user')
+            ->with(['jobs', 'jobApplications'])
+            ->withCount('jobApplications as applied_jobs_count')
             ->when($search !== '', function ($query) use ($search) {
                 $query->where(DB::raw("CONCAT(first_name, ' ', last_name)"), 'like', "%{$search}%");
             })
@@ -95,8 +97,9 @@ class UserController extends Controller
             ], 404);
         }
 
-        // Retrieve the user or fail
-        $user = User::findOrFail($id);
+        // Retrieve the user or fail with jobApplications count
+        $user = User::withCount('jobApplications as applied_jobs_count')
+                    ->findOrFail($id);
 
         // Verify the user has the role "user"
         if (!$user->hasRole('user')) {
@@ -115,10 +118,11 @@ class UserController extends Controller
                 'image_url'       => $user->image_url,
                 'background_url'  => $user->background_url,
                 'description'     => $user->description,
-                'location'     => $user->location,
+                'location'        => $user->location,
                 'cv'              => $user->cv,
                 'skills'          => $user->skills ?? [],
                 'job'             => $user->jobs[0] ?? null,
+                'applied_jobs_count' => $user->applied_jobs_count,
             ],
         ], 200);
     }
