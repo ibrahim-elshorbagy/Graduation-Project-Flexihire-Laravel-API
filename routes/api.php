@@ -15,6 +15,7 @@ use App\Http\Controllers\Company\JobListController;
 use App\Http\Controllers\Company\MyJobsController;
 use App\Http\Controllers\Profile\ProfileController;
 use \App\Http\Controllers\User\Jobs\JobApplyController;
+use \App\Http\Controllers\User\Jobs\SavedJobsController;
 use Illuminate\Support\Facades\Broadcast;
 
 //------------------------------ Login system -----------------------------------------//
@@ -62,6 +63,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('/update-profile-description',[ProfileController::class, 'updateDescription']);
         Route::post('/update-profile-location',[ProfileController::class, 'updateLocationn']);
         Route::post('/update-skills-job',[AuthenticatedSessionController::class, 'updateSkillsAndJobs']);
+
+        // Saved Jobs Routes - Simplified with toggle functionality
+        Route::post('/saved-job/toggle-saved-job', [SavedJobsController::class, 'toggleSavedJob']);
+        Route::get('/saved-job/saved-jobs', [SavedJobsController::class, 'getSavedJobs']);
 
     });
 });
