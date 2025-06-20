@@ -103,4 +103,30 @@ class User extends Authenticatable
     {
         return $this->hasMany(\App\Models\User\JobApply::class);
     }
+
+    /**
+     * Get the companies the user is following
+     */
+    public function followedCompanies()
+    {
+        return $this->belongsToMany(User::class, 'follows', 'follower_id', 'company_id')
+                    ->withTimestamps();
+    }
+
+    /**
+     * Get the users that follow this company
+     */
+    public function followers()
+    {
+        return $this->belongsToMany(User::class, 'follows', 'company_id', 'follower_id')
+                    ->withTimestamps();
+    }
+
+    /**
+     * Check if the user follows a specific company
+     */
+    public function isFollowing($companyId)
+    {
+        return $this->followedCompanies()->where('company_id', $companyId)->exists();
+    }
 }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Company;
 
 use App\Http\Controllers\Controller;
 use App\Models\JobList;
+use App\Notifications\NewJobPostNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -93,26 +94,47 @@ class JobListController extends Controller
             ], 401);
         }
 
-        $job = JobList::create([
-            'user_id' => Auth::id(),
-            'title' => $request->title,
-            'location' => $request->location,
-            'description' => $request->description,
-            'skills' => $request->skills,
-            'min_salary' => $request->min_salary,
-            'max_salary' => $request->max_salary,
-            'salary_negotiable' => $request->salary_negotiable ?? false,
-            'payment_period' => $request->payment_period,
-            'payment_currency' => $request->payment_currency ?? 'USD',
-            'hiring_multiple_candidates' => $request->hiring_multiple_candidates ?? false,
-            'date_posted' => now(),
-        ]);
+        try {
+            // Get the authenticated company
+            $company = Auth::user();
 
-        return response()->json([
-            'status' => true,
-            'message' => 'Job created successfully',
-            'job' => $job
-        ], 201);
+            // Create the job
+            $job = JobList::create([
+                'user_id' => $company->id,
+                'title' => $request->title,
+                'location' => $request->location,
+                'description' => $request->description,
+                'skills' => $request->skills,
+                'min_salary' => $request->min_salary,
+                'max_salary' => $request->max_salary,
+                'salary_negotiable' => $request->salary_negotiable ?? false,
+                'payment_period' => $request->payment_period,
+                'payment_currency' => $request->payment_currency ?? 'USD',
+                'hiring_multiple_candidates' => $request->hiring_multiple_candidates ?? false,
+                'date_posted' => now(),
+            ]);
+
+            // Get all followers of the company
+            $followers = $company->followers()->get();
+
+            // Send notification to each follower
+            foreach ($followers as $follower) {
+                $follower->notify(new NewJobPostNotification($job, $company));
+            }
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Job created successfully',
+                'job' => $job
+            ], 201);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'An error occurred while creating the job',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     public function show($id)

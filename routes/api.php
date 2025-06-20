@@ -5,18 +5,17 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
-
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\NewPasswordController;
-
 use App\Http\Controllers\Auth\SignUpWith\GoogleContoller;
 use App\Http\Controllers\ChatSystem\ChatController;
 use App\Http\Controllers\Company\JobListController;
 use App\Http\Controllers\Company\MyJobsController;
 use App\Http\Controllers\Notification\NotificationController;
+use App\Http\Controllers\Profile\FollowController;
 use App\Http\Controllers\Profile\ProfileController;
-use \App\Http\Controllers\User\Jobs\JobApplyController;
-use \App\Http\Controllers\User\Jobs\SavedJobsController;
+use App\Http\Controllers\User\Jobs\JobApplyController;
+use App\Http\Controllers\User\Jobs\SavedJobsController;
 use Illuminate\Support\Facades\Broadcast;
 
 //------------------------------ Login system -----------------------------------------//
@@ -79,6 +78,11 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/saved-job/saved-jobs', [SavedJobsController::class, 'getSavedJobs']);
 
     });
+
+    // Follow Routes
+    Route::post('follow/toggle-follow', [FollowController::class, 'toggleFollow']);
+    Route::get('follow/followed-companies', [FollowController::class, 'getFollowedCompanies']);
+
 });
 //------------------------------ Anyone -----------------------------------------//
 
@@ -140,8 +144,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 //     return $request->user();
 // });
 
-// Route::get('/verify-email/{id}/{hash}', VerifyEmailController::class)
-//                 ->middleware(['signed', 'throttle:6,1']);
+// Route::get('/verify-email/{id}/{hash}', VerifyEmailController::class)//                 ->middleware(['signed', 'throttle:6,1']);
 
 // Route::post('/email/verification-notification', [EmailVerificationNotificationController::class, 'store'])
 //                 ->middleware(['throttle:6,1']);
