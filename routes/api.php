@@ -13,6 +13,7 @@ use App\Http\Controllers\Auth\SignUpWith\GoogleContoller;
 use App\Http\Controllers\ChatSystem\ChatController;
 use App\Http\Controllers\Company\JobListController;
 use App\Http\Controllers\Company\MyJobsController;
+use App\Http\Controllers\Notification\NotificationController;
 use App\Http\Controllers\Profile\ProfileController;
 use \App\Http\Controllers\User\Jobs\JobApplyController;
 use \App\Http\Controllers\User\Jobs\SavedJobsController;
@@ -51,6 +52,15 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::post('/set-skills-job',[AuthenticatedSessionController::class, 'updateSkillsAndJobs']);
     Route::post('/check-skills-job',[AuthenticatedSessionController::class, 'checkSkillAndJob']);
+
+    // Notification Routes
+    Route::prefix('notifications')->group(function () {
+        Route::get('/', [NotificationController::class, 'getAllNotifications']);
+        Route::post('/mark-as-read/{id}', [NotificationController::class, 'markAsRead']);
+        Route::post('/mark-all-as-read', [NotificationController::class, 'markAllAsRead']);
+        Route::post('/delete/{id}', [NotificationController::class, 'deleteNotification']);
+        Route::post('/delete-all', [NotificationController::class, 'deleteAllNotifications']);
+    });
 
     Route::prefix('profile')->group(function () {
 
@@ -121,6 +131,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
     });
 
     Broadcast::routes(['middleware' => ['auth:sanctum']]);
+
+
+
+    //------------------------------ notifications -----------------------------------------//
 
 // Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
 //     return $request->user();

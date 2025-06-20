@@ -31,6 +31,10 @@ class AuthenticatedSessionController extends Controller
             // Get the count of job applications
             $jobApplicationsCount = $user->jobApplications()->count();
 
+            // Get notifications
+            $notifications = $user->notifications;
+            $unreadNotificationsCount = $user->unreadNotifications->count();
+
             // Create a new token
             $token = $user->createToken('auth_token')->plainTextToken;
             $roles = $user->roles->pluck('name');
@@ -52,6 +56,8 @@ class AuthenticatedSessionController extends Controller
                     'skills' => $user->skills ?? [],
                     'job' => $user->jobs[0] ?? '',
                     'applied_jobs_count' => $jobApplicationsCount,
+                    'notifications' => $notifications,
+                    'unread_notifications_count' => $unreadNotificationsCount,
                 ],
                 'token' => $token,
                 'token_type' => 'Bearer',

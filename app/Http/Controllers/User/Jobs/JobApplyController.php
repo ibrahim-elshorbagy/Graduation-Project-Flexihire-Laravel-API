@@ -5,6 +5,7 @@ namespace App\Http\Controllers\User\Jobs;
 use App\Http\Controllers\Controller;
 use App\Models\JobList;
 use App\Models\User\JobApply;
+use App\Notifications\NewJobApplicationNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -41,13 +42,21 @@ class JobApplyController extends Controller
                 ], 422);
             }
 
-
             $jobApply = $job->applies()->create([
                 'user_id' => Auth::id(),
                 'proposal' => $request->proposal,
                 'status' => JobApply::STATUS_PENDING,
                 'created_at'=>now()
             ]);
+
+            // Get the company (job owner) to notify
+            $company = $job->user;
+
+            // Get the current user who applied
+            $applicant = Auth::user();
+
+            // Send notification to the company about the new application
+            $company->notify(new NewJobApplicationNotification($applicant, $job, $request->proposal));
 
             return response()->json([
                 'status' => true,

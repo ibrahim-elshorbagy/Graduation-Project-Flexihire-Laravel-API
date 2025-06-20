@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Company;
 use App\Http\Controllers\Controller;
 use App\Models\JobList;
 use App\Models\User\JobApply;
+use App\Notifications\JobStatusNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -40,9 +41,25 @@ class MyJobsController extends Controller
                 ], 403);
             }
 
+            // Get old status to check if it changed
+            $oldStatus = $jobApply->status;
+            
             $jobApply->update([
                 'status' => $request->status
             ]);
+            
+            // Send notification if status changed
+            if ($oldStatus !== $request->status) {
+                // Get the job title
+                $jobTitle = $jobApply->job->title;
+                $jobId = $jobApply->job->id;
+                
+                // Get the applicant
+                $applicant = $jobApply->user;
+                
+                // Send notification directly to the applicant
+                $applicant->notify(new JobStatusNotification($jobTitle, $request->status, $jobId));
+            }
 
             return response()->json([
                 'status' => true,
