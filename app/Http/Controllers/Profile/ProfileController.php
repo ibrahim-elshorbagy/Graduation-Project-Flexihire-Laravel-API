@@ -336,4 +336,31 @@ class ProfileController extends Controller
             'cv' => $user->cv,
         ], 200);
     }
+
+    public function updateEmail(Request $request)
+    {
+        $validateUser = Validator::make($request->all(), [
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . auth()->id()],
+        ]);
+
+        if ($validateUser->fails()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Validation error',
+                'errors' => $validateUser->errors(),
+            ], 422);
+        }
+
+        $user = auth()->user();
+
+        $user->update([
+            'email' => $request->email,
+        ]);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Email updated successfully',
+            'email' => $user->email,
+        ], 200);
+    }
 }
