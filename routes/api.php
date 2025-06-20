@@ -14,6 +14,7 @@ use App\Http\Controllers\Company\MyJobsController;
 use App\Http\Controllers\Notification\NotificationController;
 use App\Http\Controllers\Profile\FollowController;
 use App\Http\Controllers\Profile\ProfileController;
+use App\Http\Controllers\Review\ReviewController;
 use App\Http\Controllers\User\Jobs\JobApplyController;
 use App\Http\Controllers\User\Jobs\SavedJobsController;
 use Illuminate\Support\Facades\Broadcast;
@@ -83,6 +84,12 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('follow/toggle-follow', [FollowController::class, 'toggleFollow']);
     Route::get('follow/followed-companies', [FollowController::class, 'getFollowedCompanies']);
 
+    // Review Routes
+    Route::prefix('reviews')->group(function () {
+        Route::post('/create', [ReviewController::class, 'store']);
+        Route::post('/delete/{id}', [ReviewController::class, 'destroy']);
+        Route::get('/my-reviews', [ReviewController::class, 'getUserReviews']);
+    });
 });
 //------------------------------ Anyone -----------------------------------------//
 

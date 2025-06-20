@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
@@ -140,28 +141,57 @@ class UserController extends Controller
             ], 404);
         }
 
-        $company = User::with('jobs')->findOrFail($id);
+        $company = User::with(['roles'])
+                ->whereHas('roles', function($q) {
+                    $q->where('name', 'company');
+                })
+                ->where('id', $id)
+                ->firstOrFail();
 
-        if (!$company->hasRole('company')) {
-            return response()->json([
-                'message' => 'Company not found or not a valid company role.'
-            ], 404);
+        // Get company reviews
+        $reviews = $company->receivedReviews()
+            ->with('user:id,first_name,last_name,image_url')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        // Calculate average rating
+        $averageRating = $reviews->avg('rating') ?? 0;
+        $reviewCount = $reviews->count();
+
+        // Check if authenticated user has already reviewed
+        $hasReviewed = false;
+        $userReview = null;
+
+        if (Auth::check()) {
+            $user = Auth::user();
+            $userReview = $reviews->where('user_id', $user->id)->first();
+            $hasReviewed = (bool) $userReview;
         }
 
+        $companyData = [
+            'id' => $company->id,
+            'first_name' => $company->first_name,
+            'last_name' => $company->last_name,
+            'email' => $company->email,
+            'description' => $company->description,
+            'location' => $company->location,
+            'image_url' => $company->image_url,
+            'background_url' => $company->background_url,
+            'type' => $company->roles[0]->name ?? null,
+            'reviews' => [
+                'items' => $reviews,
+                'average_rating' => $averageRating,
+                'count' => $reviewCount,
+                'has_reviewed' => $hasReviewed,
+                'user_review' => $userReview
+            ]
+        ];
+
         return response()->json([
-            'company' => [
-                'id' => $company->id,
-                'first_name' => $company->first_name,
-                'last_name' => $company->last_name,
-                'email' => $company->email,
-                'image_url' => $company->image_url,
-                'background_url' => $company->background_url,
-                'description'     => $company->description,
-                'location'     => $company->location,
-                'cv' => $company->cv,
-                'jobs' => $company->JobList
-            ],
-        ], 200);
+            'status' => true,
+            'company' => $companyData
+        ]);
+
     }
 
 

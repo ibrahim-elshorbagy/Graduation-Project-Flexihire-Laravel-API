@@ -129,4 +129,20 @@ class User extends Authenticatable
     {
         return $this->followedCompanies()->where('company_id', $companyId)->exists();
     }
+
+    /**
+     * Get the reviews written by the user
+     */
+    public function writtenReviews()
+    {
+        return $this->hasMany(Review::class, 'user_id');
+    }
+
+    /**
+     * Get the reviews received by the company
+     */
+    public function receivedReviews()
+    {
+        return $this->hasMany(Review::class, 'company_id');
+    }
 }

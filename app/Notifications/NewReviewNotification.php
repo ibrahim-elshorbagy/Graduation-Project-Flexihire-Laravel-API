@@ -4,23 +4,23 @@ namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
-use App\Models\JobList;
 use App\Models\User;
+use App\Models\Review;
 
-class NewJobPostNotification extends Notification
+class NewReviewNotification extends Notification
 {
     use Queueable;
 
-    protected $job;
-    protected $company;
+    protected $user;
+    protected $review;
 
     /**
      * Create a new notification instance.
      */
-    public function __construct(JobList $job, User $company)
+    public function __construct(User $user, Review $review)
     {
-        $this->job = $job;
-        $this->company = $company;
+        $this->user = $user;
+        $this->review = $review;
     }
 
     /**
@@ -41,11 +41,12 @@ class NewJobPostNotification extends Notification
     public function toArray(object $notifiable): array
     {
         return [
-            'title' => 'New Job Opportunity',
-            'message' => $this->company->first_name . ' ' . $this->company->last_name . ' posted a new job: ' . $this->job->title,
-            'job' => $this->job,
-            'company' => $this->company,
-            'type' => 'new_job_post',
+            'title' => 'New Company Review',
+            'message' => $this->user->first_name . ' ' . $this->user->last_name . ' has left a review for your company',
+            'rating' => $this->review->rating,
+            'review_id' => $this->review->id,
+            'user' => $this->user,
+            'type' => 'new_review',
         ];
     }
 }
