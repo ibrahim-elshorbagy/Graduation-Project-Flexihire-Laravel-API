@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use App\Notifications\ChatNotification;
+use App\Notifications\ChatBellNotification;
 use Illuminate\Support\Facades\Log;
 
 class ChatController extends Controller
@@ -124,7 +125,8 @@ class ChatController extends Controller
             array_merge(['id' => $id], $request->all()),
             [
                 'id' => 'required|integer|exists:users,id',
-                'message' => 'required|string|max:1000'
+                'message' => 'required|string|max:1000',
+                'is_active_chat' => 'nullable|boolean'
             ]
         );
 
@@ -155,10 +157,20 @@ class ChatController extends Controller
                 'message' => $request->message
             ]);
 
-            // Send real-time notification
+            // Get the receiver
             $receiver = User::find((int) $id);
 
+            // Only send notification if the receiver is not actively viewing this chat
+            $isActiveChat = $request->input('is_active_chat', false);
 
+            // If the receiver is not viewing this chat, send both types of notifications
+            if (!$isActiveChat) {
+
+                // Send bell notification for the notification center
+                $receiver->notify(new ChatBellNotification($request->message, $user, (int)$id));
+            }
+
+            // Send real-time chat notification
             $receiver->notify(new ChatNotification($request->message, $user, (int)$id));
 
             return response()->json([
@@ -185,5 +197,4 @@ class ChatController extends Controller
             ], 503);
         }
     }
-
 }
