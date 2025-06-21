@@ -141,7 +141,7 @@ class UserController extends Controller
             ], 404);
         }
 
-        $company = User::with(['roles'])
+        $company = User::with(['roles', 'JobList'])
                 ->whereHas('roles', function($q) {
                     $q->where('name', 'company');
                 })
@@ -168,6 +168,9 @@ class UserController extends Controller
             $hasReviewed = (bool) $userReview;
         }
 
+        // Get all jobs for this company
+        $jobs = $company->JobList;
+
         $companyData = [
             'id' => $company->id,
             'first_name' => $company->first_name,
@@ -178,6 +181,7 @@ class UserController extends Controller
             'image_url' => $company->image_url,
             'background_url' => $company->background_url,
             'type' => $company->roles[0]->name ?? null,
+            'jobs' => $jobs,
             'reviews' => [
                 'items' => $reviews,
                 'average_rating' => $averageRating,
