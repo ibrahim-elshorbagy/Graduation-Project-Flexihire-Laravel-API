@@ -62,6 +62,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('/delete-all', [NotificationController::class, 'deleteAllNotifications']);
     });
 
+    
+    // AI Recommended jobs
+    Route::get('/ai/recommended-jobs', [JobListController::class, 'Ailist']);
+
     Route::prefix('profile')->group(function () {
 
         Route::post('/update-name',[ProfileController::class, 'updateName']);

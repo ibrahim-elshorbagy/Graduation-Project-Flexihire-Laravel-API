@@ -7,6 +7,8 @@ use App\Models\JobList;
 use App\Notifications\NewJobPostNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
 class JobListController extends Controller
@@ -262,4 +264,87 @@ class JobListController extends Controller
         ]);
     }
 
+    public function Ailist(Request $request)
+    {
+        // Get the authenticated user
+        $user = Auth::user();
+        $aiRecommendedIds = [];
+        $userSkills = [];
+
+        // Get user's skills if available
+        if ($user) {
+            $userSkills = $user->skills()->pluck('name')->toArray();
+            $userSkillsString = implode(',', $userSkills);            if (!empty($userSkillsString)) {
+                try {
+                    // Get AI endpoint URL from config
+                    $aiEndpoint = config('ai.recommendation_url');
+
+                    // Only proceed if we have a valid URL
+                    if (!empty($aiEndpoint)) {
+                        Log::info("Using AI Recommendation URL: " . $aiEndpoint);
+
+                        // Make the API call only if we have a valid URL
+                        $aiResponse = Http::timeout(3)->post($aiEndpoint, [
+                            'skills' => $userSkillsString
+                        ]);
+
+                        // Check if the API call was successful
+                        if ($aiResponse->successful()) {
+                            $aiRecommendedIds = collect($aiResponse->json())->pluck('id')->toArray();
+                        }
+                    } else {
+                        Log::info("No AI recommendation URL available, skipping API call");
+                    }
+                } catch (\Exception $e) {
+                    Log::info("error calling AI recommendation API: " . $e->getMessage());
+                    // Continue without AI recommendations if API fails
+                }
+            }
+        }
+
+        // If we have AI recommendations, return only the first 5 jobs
+        if (!empty($aiRecommendedIds)) {
+            $aiJobs = JobList::with('user')
+                ->whereIn('id', $aiRecommendedIds)
+                ->limit(10)
+                ->get()
+                ->map(function ($job) {
+                    $job->ai = true;
+                    return $job;
+                });
+
+            return response()->json([
+                'message' => 'AI recommended jobs retrieved successfully',
+                'data' => $aiJobs,
+            ]);
+        } else {
+            // If no AI recommendations, find only 5 jobs with similar skills to the user
+            if (!empty($userSkills)) {
+                $similarSkillJobs = JobList::with('user')
+                    ->where(function ($query) use ($userSkills) {
+                        foreach ($userSkills as $skill) {
+                            $query->orWhereJsonContains('skills', $skill);
+                        }
+                    })
+                    ->limit(10)
+                    ->get();
+
+                return response()->json([
+                    'message' => 'Similar skill jobs retrieved successfully',
+                    'data' => $similarSkillJobs,
+                ]);
+            } else {
+                // If user has no skills, return only 5 recent jobs
+                $recentJobs = JobList::with('user')
+                    ->orderBy('date_posted', 'desc')
+                    ->limit(10)
+                    ->get();
+
+                return response()->json([
+                    'message' => 'Recent jobs retrieved successfully',
+                    'data' => $recentJobs,
+                ]);
+            }
+        }
+    }
 }
