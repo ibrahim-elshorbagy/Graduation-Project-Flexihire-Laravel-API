@@ -38,6 +38,15 @@ class LoginForm extends Form
             ]);
         }
 
+        // Check if the authenticated user has admin role
+        if (! Auth::user()->hasRole('admin')) {
+            Auth::logout();
+            
+            throw ValidationException::withMessages([
+                'form.email' => 'Access denied. Only administrators can login here.',
+            ]);
+        }
+
         RateLimiter::clear($this->throttleKey());
     }
 

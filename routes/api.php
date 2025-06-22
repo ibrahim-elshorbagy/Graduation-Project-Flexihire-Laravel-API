@@ -26,7 +26,7 @@ Route::middleware(['guest','api'])->group(function () {
 
     Route::post('/register', [RegisteredUserController::class, 'store']);
 
-    Route::post('/login', [AuthenticatedSessionController::class, 'store'])->name('login');
+    Route::post('/login', [AuthenticatedSessionController::class, 'store']);
 
     Route::post('/forgot-password', [PasswordResetLinkController::class, 'store']);
 
@@ -62,7 +62,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('/delete-all', [NotificationController::class, 'deleteAllNotifications']);
     });
 
-    
+
     // AI Recommended jobs
     Route::get('/ai/recommended-jobs', [JobListController::class, 'Ailist']);
 
