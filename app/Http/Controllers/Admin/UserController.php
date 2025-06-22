@@ -211,5 +211,32 @@ class UserController extends Controller
 
     }
 
+    public function getTopCompanies()
+    {
+        $companies = User::role('company')
+            ->with('receivedReviews')
+            ->withCount('JobList as jobs_count')
+            ->get();
+
+        // Calculate average rating for each company and sort by rating
+        $topCompanies = $companies->map(function($company) {
+            $reviews = $company->receivedReviews;
+            $company->average_rating = $reviews->avg('rating') ?? 0;
+            $company->review_count = $reviews->count();
+
+            // Remove the reviews collection to avoid sending all review data
+            unset($company->receivedReviews);
+
+            return $company;
+        })
+        ->sortByDesc('average_rating')
+        ->take(10)
+        ->values();
+
+        return response()->json([
+            'message' => 'Top companies retrieved successfully.',
+            'data' => $topCompanies,
+        ], 200);
+    }
 
 }

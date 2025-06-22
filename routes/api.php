@@ -100,6 +100,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::get('/users', [UserController::class, 'getUsers']);
     Route::get('/companies', [UserController::class, 'getCompanies']);
+    Route::get('/top-companies', [UserController::class, 'getTopCompanies']);
     Route::get('/user/{id}', [UserController::class, 'getUserInfo']);
     Route::get('/company/{id}', [UserController::class, 'getCompanyInfo']);
 
