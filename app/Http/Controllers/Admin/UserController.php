@@ -76,7 +76,20 @@ class UserController extends Controller
             ->when($searchLocation !== '', function ($query) use ($searchLocation) {
                 $query->where('location',$searchLocation);
             })
+            ->with('receivedReviews')
             ->paginate($perPage);
+
+        // Add average rating to each company
+        $companies->getCollection()->transform(function($company) {
+            $reviews = $company->receivedReviews;
+            $company->average_rating = $reviews->avg('rating') ?? 0;
+            $company->review_count = $reviews->count();
+
+            // Remove the reviews collection to avoid sending all review data
+            unset($company->receivedReviews);
+
+            return $company;
+        });
 
         return response()->json([
             'message' => 'Companies retrieved successfully.',
