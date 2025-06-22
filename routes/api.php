@@ -94,6 +94,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('/delete/{id}', [ReviewController::class, 'destroy']);
         Route::get('/my-reviews', [ReviewController::class, 'getUserReviews']);
     });
+
+    Route::get('/auth-companies', [UserController::class, 'authGetCompanies']);
+    Route::get('/auth-jobs', [UserController::class, 'authGetJobs']);
 });
 //------------------------------ Anyone -----------------------------------------//
 

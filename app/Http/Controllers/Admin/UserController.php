@@ -239,4 +239,119 @@ class UserController extends Controller
         ], 200);
     }
 
+    public function authGetCompanies(Request $request)
+    {
+        $validator = Validator::make($request->query(), [
+            'per_page' => 'nullable|integer|min:1|max:250',
+            'search' => 'nullable|string|max:255',
+            'searchLocation' => 'nullable|string|max:255'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Validation error',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        $perPage = $request->query('per_page', 10);
+        $search = $request->query('search', '');
+        $searchLocation = $request->query('searchLocation', '');
+
+        // Get the authenticated user's followed company IDs
+        $followedCompanyIds = Auth::user()->followedCompanies()->pluck('users.id')->toArray();
+
+        $companies = User::role('company')
+            ->when($search !== '', function ($query) use ($search) {
+                $query->where(DB::raw("CONCAT(first_name, ' ', last_name)"), 'like', "%{$search}%");
+            })
+            ->when($searchLocation !== '', function ($query) use ($searchLocation) {
+                $query->where('location', $searchLocation);
+            })
+            ->with('receivedReviews')
+            ->paginate($perPage);
+
+        // Add average rating and following status to each company
+        $companies->getCollection()->transform(function($company) use ($followedCompanyIds) {
+            $reviews = $company->receivedReviews;
+            $company->average_rating = $reviews->avg('rating') ?? 0;
+            $company->review_count = $reviews->count();
+            $company->following = in_array($company->id, $followedCompanyIds);
+
+            // Remove the reviews collection to avoid sending all review data
+            unset($company->receivedReviews);
+
+            return $company;
+        });
+
+        return response()->json([
+            'message' => 'Companies retrieved successfully.',
+            'data' => $companies,
+        ], 200);
+    }
+
+    public function authGetJobs(Request $request)
+    {
+        $validator = Validator::make($request->query(), [
+            'per_page' => 'nullable|integer|min:1|max:250',
+            'search' => 'nullable|string|max:255',
+            'searchLocation' => 'nullable|string|max:255',
+            'minSalary' => 'nullable|integer|min:0',
+            'maxSalary' => 'nullable|integer|min:0',
+            'skills' => 'nullable|array',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Validation error',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        $perPage = $request->query('per_page', 10);
+        $search = $request->query('search', '');
+        $searchLocation = $request->query('searchLocation', '');
+        $minSalary = $request->query('minSalary');
+        $maxSalary = $request->query('maxSalary');
+        $skills = $request->query('skills', []);
+
+        // Get the authenticated user's saved job IDs
+        $savedJobIds = Auth::user()->savedJobs()->pluck('job_lists.id')->toArray();
+
+        $jobs = \App\Models\JobList::with(['user'])
+            ->when($search !== '', function ($query) use ($search) {
+                $query->where('title', 'like', "%{$search}%");
+            })
+            ->when($searchLocation !== '', function ($query) use ($searchLocation) {
+                $query->where('location', 'like', "%{$searchLocation}%");
+            })
+            ->when(!empty($skills), function ($query) use ($skills) {
+                $query->where(function($q) use ($skills) {
+                    foreach ($skills as $skill) {
+                        $q->orWhereJsonContains('skills', $skill);
+                    }
+                });
+            })
+            ->when(!is_null($minSalary), function ($query) use ($minSalary) {
+                $query->where('min_salary', '>=', $minSalary);
+            })
+            ->when(!is_null($maxSalary), function ($query) use ($maxSalary) {
+                $query->where('max_salary', '<=', $maxSalary);
+            })
+            ->orderBy('date_posted', 'desc')
+            ->orderBy('id', 'desc')
+            ->paginate($perPage);
+
+        // Add saved status to each job
+        $jobs->getCollection()->transform(function($job) use ($savedJobIds) {
+            $job->saved = in_array($job->id, $savedJobIds);
+            return $job;
+        });
+
+        return response()->json([
+            'message' => 'Jobs retrieved successfully.',
+            'data' => $jobs,
+        ], 200);
+    }
+
 }
