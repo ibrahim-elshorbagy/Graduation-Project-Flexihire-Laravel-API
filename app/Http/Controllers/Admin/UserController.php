@@ -222,7 +222,7 @@ class UserController extends Controller
 
         // Get company reviews
         $reviews = $company->receivedReviews()
-            ->with('user:id,first_name,last_name,image_url')
+            ->with('user:id,first_name,last_name,image_url', 'user.jobs:id,name')
             ->orderBy('created_at', 'desc')
             ->get();
 
