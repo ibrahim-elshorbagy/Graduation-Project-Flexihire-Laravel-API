@@ -97,6 +97,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::get('/auth-companies', [UserController::class, 'authGetCompanies']);
     Route::get('/auth-jobs', [UserController::class, 'authGetJobs']);
+    Route::get('/auth-company/{id}', [UserController::class, 'authGetCompanyInfo']);
+
 });
 //------------------------------ Anyone -----------------------------------------//
 

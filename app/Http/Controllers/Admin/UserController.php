@@ -171,15 +171,6 @@ class UserController extends Controller
         $averageRating = $reviews->avg('rating') ?? 0;
         $reviewCount = $reviews->count();
 
-        // Check if authenticated user has already reviewed
-        $hasReviewed = false;
-        $userReview = null;
-
-        if (Auth::check()) {
-            $user = Auth::user();
-            $userReview = $reviews->where('user_id', $user->id)->first();
-            $hasReviewed = (bool) $userReview;
-        }
 
         // Get all jobs for this company
         $jobs = $company->JobList;
@@ -199,6 +190,78 @@ class UserController extends Controller
                 'items' => $reviews,
                 'average_rating' => $averageRating,
                 'count' => $reviewCount,
+            ]
+        ];
+
+        return response()->json([
+            'status' => true,
+            'company' => $companyData
+        ]);
+
+    }
+
+    public function authGetCompanyInfo(Request $request, $id)
+    {
+        $validator = Validator::make(['id' => $id], [
+            'id' => 'required|integer|exists:users,id',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Error entering company id',
+                'errors' => $validator->errors(),
+            ], 404);
+        }
+
+        $company = User::with(['roles', 'JobList'])
+                ->whereHas('roles', function($q) {
+                    $q->where('name', 'company');
+                })
+                ->where('id', $id)
+                ->firstOrFail();
+
+        // Get company reviews
+        $reviews = $company->receivedReviews()
+            ->with('user:id,first_name,last_name,image_url')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $averageRating = $reviews->avg('rating') ?? 0;
+        $reviewCount = $reviews->count();
+
+        // Check if authenticated user has already reviewed
+        $hasReviewed = false;
+        $userReview = null;
+        $isFollowing = false;
+
+        if (Auth::check()) {
+            $user = Auth::user();
+            $userReview = $reviews->where('user_id', $user->id)->first();
+            $hasReviewed = (bool) $userReview;
+
+            // Check if user is following this company
+            $isFollowing = $user->isFollowing($company->id);
+        }
+
+        // Get all jobs for this company
+        $jobs = $company->JobList;
+
+        $companyData = [
+            'id' => $company->id,
+            'first_name' => $company->first_name,
+            'last_name' => $company->last_name,
+            'email' => $company->email,
+            'description' => $company->description,
+            'location' => $company->location,
+            'image_url' => $company->image_url,
+            'background_url' => $company->background_url,
+            'type' => $company->roles[0]->name ?? null,
+            'following' => $isFollowing,
+            'jobs' => $jobs,
+            'reviews' => [
+                'items' => $reviews,
+                'average_rating' => $averageRating,
+                'count' => $reviewCount,
                 'has_reviewed' => $hasReviewed,
                 'user_review' => $userReview
             ]
@@ -210,7 +273,6 @@ class UserController extends Controller
         ]);
 
     }
-
     public function getTopCompanies()
     {
         $companies = User::role('company')
