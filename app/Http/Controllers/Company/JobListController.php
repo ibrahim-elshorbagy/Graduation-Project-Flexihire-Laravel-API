@@ -329,7 +329,7 @@ class JobListController extends Controller
 
                         // Make the API call only if we have a valid URL
                         $aiResponse = Http::timeout(3)->post($aiEndpoint, [
-                            'skills' => $userSkillsString
+                            'skills' => $user->description
                         ]);
 
                         // Check if the API call was successful
