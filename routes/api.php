@@ -14,6 +14,7 @@ use App\Http\Controllers\Company\MyJobsController;
 use App\Http\Controllers\Notification\NotificationController;
 use App\Http\Controllers\Profile\FollowController;
 use App\Http\Controllers\Profile\ProfileController;
+use App\Http\Controllers\Report\ReportController;
 use App\Http\Controllers\Review\ReviewController;
 use App\Http\Controllers\User\Jobs\JobApplyController;
 use App\Http\Controllers\User\Jobs\SavedJobsController;
@@ -93,6 +94,11 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('/create', [ReviewController::class, 'store']);
         Route::post('/delete/{id}', [ReviewController::class, 'destroy']);
         Route::get('/my-reviews', [ReviewController::class, 'getUserReviews']);
+    });
+
+    // Report Routes
+    Route::prefix('reports')->group(function () {
+        Route::post('/create', [ReportController::class, 'store']);
     });
 
     Route::get('/auth-companies', [UserController::class, 'authGetCompanies']);

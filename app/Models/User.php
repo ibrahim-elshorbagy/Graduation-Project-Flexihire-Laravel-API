@@ -145,4 +145,20 @@ class User extends Authenticatable
     {
         return $this->hasMany(Review::class, 'company_id');
     }
+
+    /**
+     * Get the reports made by the user
+     */
+    public function madeReports()
+    {
+        return $this->hasMany(\App\Models\Report\Report::class, 'reporter_id');
+    }
+
+    /**
+     * Get the reports received by the user
+     */
+    public function receivedReports()
+    {
+        return $this->hasMany(\App\Models\Report\Report::class, 'reported_user_id');
+    }
 }
