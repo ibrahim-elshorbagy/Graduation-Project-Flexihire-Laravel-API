@@ -1,5 +1,7 @@
 <?php
 
+use App\Livewire\Pages\Admin\Reports\ReportsList;
+use App\Livewire\Pages\Admin\Reports\ReportShow;
 use App\Livewire\Pages\Admin\UserManagement\UsersList;
 use App\Livewire\Pages\Admin\UserManagement\UsersForm;
 use Illuminate\Support\Facades\Route;
@@ -22,8 +24,9 @@ Route::middleware(['auth', 'verified','role:admin'])->prefix('admin')->name('adm
     Route::get('/users/create', UsersForm::class)->name('users.create');
     Route::get('/users/{userId}/edit', UsersForm::class)->name('users.edit');
 
-
-    
+    // Report Management
+    Route::get('/reports', ReportsList::class)->name('reports');
+    Route::get('/reports/{id}', ReportShow::class)->name('reports.show');
 });
 
 require __DIR__.'/auth.php';

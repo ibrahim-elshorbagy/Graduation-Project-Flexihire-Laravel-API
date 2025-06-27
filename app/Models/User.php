@@ -31,6 +31,7 @@ class User extends Authenticatable
         'image_url',
         'background_url',
         'cv',
+        'blocked',
     ];
 
     /**
