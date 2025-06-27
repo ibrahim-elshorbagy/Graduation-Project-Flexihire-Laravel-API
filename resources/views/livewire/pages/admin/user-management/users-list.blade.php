@@ -11,9 +11,55 @@
         </div>
     </div>
 
-    <!-- Search Box -->
-    <div class="mb-4">
-        <x-text-input type="text" wire:model.live="search" placeholder="Search users..." class="w-full"/>
+    <!-- Search Box and Clear Filters -->
+    <div class="mb-4 flex gap-3">
+        <div class="flex-1">
+            <x-text-input type="text" wire:model.live="search" placeholder="Search users..." class="w-full"/>
+        </div>
+        @if($search || $roleFilter !== 'all')
+            <button wire:click="clearFilters" 
+                    class="px-4 py-2 text-sm text-gray-600 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 hover:text-gray-800 transition-colors">
+                Clear Filters
+            </button>
+        @endif
+    </div>
+
+    <!-- Role Filter Tabs -->
+    <div class="mb-6">
+        <div class="flex gap-2 overflow-x-auto border-b border-neutral-300" role="tablist" aria-label="role filter options">
+            <button wire:click="setRoleFilter('all')" 
+                    class="inline-flex items-center h-min px-4 py-2 text-sm {{ $roleFilter === 'all' ? 'font-bold text-black border-b-2 border-black' : 'text-neutral-600 font-medium hover:border-b-2 hover:border-b-neutral-800 hover:text-neutral-900' }}" 
+                    type="button" role="tab">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
+                </svg>
+                All Users
+            </button>
+            <button wire:click="setRoleFilter('user')" 
+                    class="inline-flex items-center h-min px-4 py-2 text-sm {{ $roleFilter === 'user' ? 'font-bold text-black border-b-2 border-black' : 'text-neutral-600 font-medium hover:border-b-2 hover:border-b-neutral-800 hover:text-neutral-900' }}" 
+                    type="button" role="tab">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                </svg>
+                Users
+            </button>
+            <button wire:click="setRoleFilter('company')" 
+                    class="inline-flex items-center h-min px-4 py-2 text-sm {{ $roleFilter === 'company' ? 'font-bold text-black border-b-2 border-black' : 'text-neutral-600 font-medium hover:border-b-2 hover:border-b-neutral-800 hover:text-neutral-900' }}" 
+                    type="button" role="tab">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                </svg>
+                Companies
+            </button>
+            <button wire:click="setRoleFilter('admin')" 
+                    class="inline-flex items-center h-min px-4 py-2 text-sm {{ $roleFilter === 'admin' ? 'font-bold text-black border-b-2 border-black' : 'text-neutral-600 font-medium hover:border-b-2 hover:border-b-neutral-800 hover:text-neutral-900' }}" 
+                    type="button" role="tab">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.031 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                </svg>
+                Admins
+            </button>
+        </div>
     </div>
 
     <!-- Flash Message -->
@@ -22,6 +68,24 @@
             {{ session('message') }}
         </div>
     @endif
+
+    <!-- Results Summary -->
+    <div class="mb-4 flex items-center justify-between">
+        <div class="text-sm text-gray-600">
+            Showing {{ $users->count() }} of {{ $users->total() }} 
+            @if($roleFilter !== 'all')
+                {{ $roleFilter === 'user' ? 'users' : ($roleFilter === 'company' ? 'companies' : 'admins') }}
+            @else
+                users
+            @endif
+            @if($search)
+                matching "{{ $search }}"
+            @endif
+        </div>
+        <div class="text-sm text-gray-500">
+            Total: {{ $users->total() }} {{ $users->total() === 1 ? 'user' : 'users' }}
+        </div>
+    </div>
 
     <!-- Users Table -->
     <div class="overflow-x-auto rounded-lg shadow">

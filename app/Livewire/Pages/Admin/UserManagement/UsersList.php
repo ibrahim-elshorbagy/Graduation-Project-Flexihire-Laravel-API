@@ -15,14 +15,34 @@ class UsersList extends Component
 
     public $search = '';
     public $perPage = 10;
+    public $roleFilter = 'all';
 
     protected $queryString = [
         'search' => ['except' => ''],
         'perPage' => ['except' => 10],
+        'roleFilter' => ['except' => 'all'],
     ];
 
     public function updatingSearch()
     {
+        $this->resetPage();
+    }
+
+    public function updatingRoleFilter()
+    {
+        $this->resetPage();
+    }
+
+    public function setRoleFilter($role)
+    {
+        $this->roleFilter = $role;
+        $this->resetPage();
+    }
+
+    public function clearFilters()
+    {
+        $this->search = '';
+        $this->roleFilter = 'all';
         $this->resetPage();
     }
 
@@ -42,6 +62,12 @@ class UsersList extends Component
                   ->orWhere('last_name', 'like', '%' . $this->search . '%')
                   ->orWhere('email', 'like', '%' . $this->search . '%');
         })
+        ->when($this->roleFilter !== 'all', function ($query) {
+            $query->whereHas('roles', function ($roleQuery) {
+                $roleQuery->where('name', $this->roleFilter);
+            });
+        })
+        ->with('roles')
         ->paginate($this->perPage);
 
         return view('livewire.pages.admin.user-management.users-list', [
