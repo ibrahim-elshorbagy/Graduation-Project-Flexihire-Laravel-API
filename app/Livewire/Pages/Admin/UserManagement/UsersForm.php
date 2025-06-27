@@ -19,6 +19,7 @@ class UsersForm extends Component
     public $password_confirmation;
     public $selectedRole = '';
     public $permissions = [];
+    public $blocked = false;
 
     public function mount($userId = null)
     {
@@ -30,6 +31,7 @@ class UsersForm extends Component
             $this->last_name = $user->last_name;
             $this->selectedRole = $user->roles->first()?->name ?? '';
             $this->permissions = $user->permissions->pluck('name')->toArray();
+            $this->blocked = $user->blocked;
         } else {
             // Set default role if exists
             $defaultRole = Role::where('name', 'user')->first();
@@ -70,6 +72,7 @@ class UsersForm extends Component
             'email' => $this->email,
             'first_name' => $this->first_name,
             'last_name' => $this->last_name,
+            'blocked' => $this->blocked,
         ];
 
         if ($this->password) {
@@ -95,6 +98,7 @@ class UsersForm extends Component
             // Create new user
             $userData['image_url'] = 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png';
             $userData['email_verified_at'] = now();
+            $userData['blocked'] = $this->blocked;
 
             $user = User::create($userData);
             $user->assignRole($this->selectedRole);

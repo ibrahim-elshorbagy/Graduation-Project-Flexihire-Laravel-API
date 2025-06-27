@@ -31,6 +31,8 @@ class User extends Authenticatable
         'image_url',
         'background_url',
         'cv',
+        'location',
+        'description',
         'blocked',
     ];
 
@@ -57,6 +59,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'blocked' => 'boolean',
         ];
     }
 

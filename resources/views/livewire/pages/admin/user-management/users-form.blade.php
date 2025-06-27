@@ -64,6 +64,15 @@
                     </select>
                     <x-input-error :messages="$errors->get('selectedRole')" class="mt-2" />
                 </div>
+
+                <!-- Blocked Status -->
+                <div>
+                    <label class="flex items-center">
+                        <input type="checkbox" wire:model="blocked" class="rounded border-gray-300 text-primary shadow-sm focus:border-primary focus:ring-primary">
+                        <span class="ml-2 text-sm text-gray-600">Block this user</span>
+                    </label>
+                    <div class="mt-1 text-sm text-gray-500">Blocked users cannot access the system</div>
+                </div>
             </div>
 
 

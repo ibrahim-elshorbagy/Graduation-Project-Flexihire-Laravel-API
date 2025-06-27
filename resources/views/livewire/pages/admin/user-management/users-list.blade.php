@@ -37,6 +37,9 @@
                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Role
                     </th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Status
+                    </th>
                     <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Actions
                     </th>
@@ -65,7 +68,15 @@
                                 {{ $user->roles->first()?->name ?? 'No role' }}
                             </div>
                         </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $user->blocked ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800' }}">
+                                {{ $user->blocked ? 'Blocked' : 'Active' }}
+                            </span>
+                        </td>
                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            <a href="{{ route('admin.users.profile', $user->id) }}" class="text-blue-600 hover:text-blue-900 mr-3">
+                                View Profile
+                            </a>
                             <a href="{{ route('admin.users.edit', $user->id) }}" class="text-primary hover:text-primary/70 mr-3">
                                 Edit
                             </a>
@@ -76,7 +87,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="4" class="px-6 py-4 text-center text-gray-500">
+                        <td colspan="5" class="px-6 py-4 text-center text-gray-500">
                             No users found.
                         </td>
                     </tr>
