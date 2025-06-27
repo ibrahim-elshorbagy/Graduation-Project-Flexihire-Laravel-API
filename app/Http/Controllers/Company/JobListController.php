@@ -175,6 +175,50 @@ class JobListController extends Controller
     }
 
 
+
+
+
+    public function authShowJob($id)
+    {
+        $validator = Validator::make(['id' => $id], [
+            'id' => 'required|integer|exists:job_lists,id'
+        ]);
+
+        // Check if validation fails
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Invalid job ID',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        $job = JobList::with('user')->find( (int) $id);
+
+        $response = [
+            'status' => true,
+            'job' => $job,
+            'has_applied' => false,
+            'is_saved' => false
+        ];
+
+        // Check if token is valid
+        $user = Auth::guard('sanctum')->user();
+
+        if ($user) {
+            $hasApplied = \App\Models\User\JobApply::where('user_id', $user->id)
+                ->where('job_id', (int) $id)
+                ->exists();
+            $response['has_applied'] = $hasApplied;
+
+            // Check if user has saved this job
+            $isSaved = $user->savedJobs()->where('job_id', (int) $id)->exists();
+            $response['is_saved'] = $isSaved;
+        }
+
+        return response()->json($response);
+    }
+
+
     public function update(Request $request, $id)
     {
         $validator = Validator::make(['id' => $id], [
