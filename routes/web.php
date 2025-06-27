@@ -5,14 +5,13 @@ use App\Livewire\Pages\Admin\Reports\ReportShow;
 use App\Livewire\Pages\Admin\UserManagement\UsersList;
 use App\Livewire\Pages\Admin\UserManagement\UsersForm;
 use App\Livewire\Pages\Admin\UserManagement\UserProfile;
+use App\Livewire\Admin\Dashboard;
 use Illuminate\Support\Facades\Route;
 
 
 Route::redirect('/', 'dashboard');
 
-Route::view('dashboard', 'dashboard')
-    ->middleware(['auth', 'verified'])
-    ->name('dashboard');
+Route::middleware(['auth', 'verified','role:admin'])->get('dashboard', Dashboard::class)->name('dashboard');
 
 Route::view('profile', 'profile')
     ->middleware(['auth'])
@@ -20,6 +19,8 @@ Route::view('profile', 'profile')
 
 // Admin Routes
 Route::middleware(['auth', 'verified','role:admin'])->prefix('admin')->name('admin.')->group(function () {
+    // Dashboard
+    
     // User Management
     Route::get('/users', UsersList::class)->name('users');
     Route::get('/users/create', UsersForm::class)->name('users.create');
