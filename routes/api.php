@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Ai\AiRankController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\RegisteredUserController;
@@ -66,6 +67,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     // AI Recommended jobs
     Route::get('/ai/recommended-jobs', [JobListController::class, 'Ailist']);
+    
+    Route::get('/ai/read-my-cv', [AiRankController::class, 'index']);
 
     Route::prefix('profile')->group(function () {
 
@@ -134,6 +137,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
         Route::get('/dashboard/company/my-jobs/', [MyJobsController::class, 'myJobs']);
         Route::get('/dashboard/company/my-job-proposals/{id}', [MyJobsController::class, 'myJobProposals']);
+        Route::get('/dashboard/company/rank-job-proposals/{id}', [MyJobsController::class, 'RankMyJobProposals']);
         Route::post('/dashboard/company/update-application-status/{id}', [MyJobsController::class, 'updateApplicationStatus']);
 
     });

@@ -11,4 +11,6 @@ return [
     |
     */
     'recommendation_url' => env('AI_RECOMMENDATION_URL'),
+    'rank_url' => env('AI_Rank_URL'),
+    
 ];
