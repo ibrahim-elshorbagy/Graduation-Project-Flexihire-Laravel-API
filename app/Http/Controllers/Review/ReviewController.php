@@ -36,6 +36,14 @@ class ReviewController extends Controller
             $userId = $user->id; // Explicitly get the user ID as an integer
             $companyId = (int)$request->company_id; // Cast to integer to ensure it's not a string
 
+            // company
+            if (!$user->hasRole('company')) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'company cannot review companies'
+                ], 422);
+            }
+
             // Check if the ID is for a company
             $company = User::findOrFail($companyId);
             if (!$company->hasRole('company')) {

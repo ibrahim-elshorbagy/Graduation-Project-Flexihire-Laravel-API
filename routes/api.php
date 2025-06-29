@@ -119,6 +119,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/top-companies', [UserController::class, 'getTopCompanies']);
     Route::get('/user/{id}', [UserController::class, 'getUserInfo']);
     Route::get('/company/{id}', [UserController::class, 'getCompanyInfo']);
+    
+    // Public Follow Routes
+    Route::get('/company/{id}/followers', [FollowController::class, 'getFlowers']);
+    Route::get('/user/{id}/following', [FollowController::class, 'getFollowings']);
 
 //------------------------------ Anyone company -----------------------------------------//
 

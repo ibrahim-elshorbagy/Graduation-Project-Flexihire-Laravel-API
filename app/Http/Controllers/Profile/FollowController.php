@@ -115,4 +115,109 @@ class FollowController extends Controller
         }
     }
 
+    public function getFlowers(Request $request, $id)
+    {
+        try {
+            $validator = Validator::make(
+                ['id' => $id] + $request->query(),
+                [
+                    'id' => 'required|exists:users,id',
+                    'per_page' => 'nullable|integer|min:1|max:100',
+                    'search' => 'nullable|string|max:255',
+                ]
+            );
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Validation error',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            $perPage = $request->query('per_page', 10);
+            $search = $request->query('search', '');
+
+            // Find the company
+            $company = User::findOrFail($id);
+            
+            // Check if the ID is for a company
+            if (!$company->hasRole('company')) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'This ID is not for a company'
+                ], 422);
+            }
+
+            // Get followers (users who follow this company)
+            $followers = $company->followers()
+                ->when($search !== '', function ($query) use ($search) {
+                    $query->where(DB::raw("CONCAT(first_name, ' ', last_name)"), 'like', "%{$search}%");
+                })
+                ->with(['roles'])
+                ->paginate($perPage);
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Company followers retrieved successfully',
+                'data' => $followers
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'An error occurred while retrieving company followers',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function getFollowings(Request $request, $id)
+    {
+        try {
+            $validator = Validator::make(
+                ['id' => $id] + $request->query(),
+                [
+                    'id' => 'required|exists:users,id',
+                    'per_page' => 'nullable|integer|min:1|max:100',
+                    'search' => 'nullable|string|max:255',
+                ]
+            );
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Validation error',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            $perPage = $request->query('per_page', 10);
+            $search = $request->query('search', '');
+
+            // Find the user
+            $user = User::findOrFail($id);
+
+            // Get companies the user is following
+            $followedCompanies = $user->followedCompanies()
+                ->when($search !== '', function ($query) use ($search) {
+                    $query->where(DB::raw("CONCAT(first_name, ' ', last_name)"), 'like', "%{$search}%");
+                })
+                ->with(['roles'])
+                ->paginate($perPage);
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Followed companies retrieved successfully',
+                'data' => $followedCompanies
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'An error occurred while retrieving followed companies',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
 }
