@@ -8,6 +8,7 @@ use App\Livewire\Pages\Admin\UserManagement\UserProfile;
 use App\Livewire\Admin\Dashboard;
 use Illuminate\Support\Facades\Route;
 
+use App\Livewire\Pages\Admin\ContactUs\ContactUsList;
 
 Route::redirect('/', 'dashboard');
 
@@ -30,6 +31,10 @@ Route::middleware(['auth', 'verified','role:admin'])->prefix('admin')->name('adm
     // Report Management
     Route::get('/reports', ReportsList::class)->name('reports');
     Route::get('/reports/{id}', ReportShow::class)->name('reports.show');
+
+    Route::get('/admin/contact-messages', ContactUsList::class)->name('contact-messages');
+
 });
+
 
 require __DIR__.'/auth.php';

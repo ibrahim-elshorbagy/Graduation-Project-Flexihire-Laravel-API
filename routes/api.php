@@ -19,6 +19,7 @@ use App\Http\Controllers\Report\ReportController;
 use App\Http\Controllers\Review\ReviewController;
 use App\Http\Controllers\User\Jobs\JobApplyController;
 use App\Http\Controllers\User\Jobs\SavedJobsController;
+use App\Http\Controllers\ContactUs\ContactUsController;
 use Illuminate\Support\Facades\Broadcast;
 
 //------------------------------ Login system -----------------------------------------//
@@ -54,6 +55,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::post('/set-skills-job',[AuthenticatedSessionController::class, 'updateSkillsAndJobs']);
     Route::post('/check-skills-job',[AuthenticatedSessionController::class, 'checkSkillAndJob']);
+
+    // Contact Us Route
+    Route::post('/contact-us', [ContactUsController::class, 'store']);
 
     // Notification Routes
     Route::prefix('notifications')->group(function () {
