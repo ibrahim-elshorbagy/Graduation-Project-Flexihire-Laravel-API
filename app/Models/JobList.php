@@ -11,7 +11,8 @@ class JobList extends Model
     use HasFactory;
     protected $guarded = ['id'];
 
-    public $timestamps = false;
+    // Enable timestamps since they were added to migration
+    public $timestamps = true;
 
     public function user()
     {

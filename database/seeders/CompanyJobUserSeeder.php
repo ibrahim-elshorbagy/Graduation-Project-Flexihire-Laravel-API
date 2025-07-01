@@ -406,7 +406,7 @@ class CompanyJobUserSeeder extends Seeder
                     'location' => User::find($companyId)->location,
                     'date_posted' => $currentDate->copy()->subDays(rand(1, 30))->format('Y-m-d'),
                     'description' => $jobData['description'],
-                    'skills' => json_encode($jobData['skills']),
+                    'skills' => $jobData['skills'],
                     'min_salary' => $jobData['min_salary'],
                     'max_salary' => $jobData['max_salary'],
                     'salary_negotiable' => (bool)rand(0, 1),
