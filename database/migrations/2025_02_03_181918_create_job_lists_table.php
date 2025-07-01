@@ -31,6 +31,7 @@ return new class extends Migration
             ])->nullable();
             $table->string('payment_currency', 3)->default('USD');
             $table->boolean('hiring_multiple_candidates')->default(false);
+            $table->timestamps();
         });
     }
 

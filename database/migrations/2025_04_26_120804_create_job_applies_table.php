@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('job_id')->constrained('job_lists')->cascadeOnDelete();
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->text('proposal');
+            $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
             $table->timestamps();
         });
     }
