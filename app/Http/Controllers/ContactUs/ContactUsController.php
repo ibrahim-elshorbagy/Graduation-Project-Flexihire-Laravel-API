@@ -27,22 +27,17 @@ class ContactUsController extends Controller
                     'errors' => $validator->errors()
                 ], 422);
             }
-
             $user = Auth::user();
-            
             // Create the contact message
             $contactMessage = ContactUs::create([
                 'user_id' => $user->id,
                 'message' => $request->message,
                 'is_read' => false,
             ]);
-
-
             return response()->json([
                 'status' => true,
                 'message' => 'Your message has been sent successfully',
             ], 201);
-
         } catch (\Exception $e) {
             return response()->json([
                 'status' => false,

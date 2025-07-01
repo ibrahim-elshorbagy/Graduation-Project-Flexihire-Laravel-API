@@ -37,7 +37,7 @@ class ReviewController extends Controller
             $companyId = (int)$request->company_id; // Cast to integer to ensure it's not a string
 
             // company
-            if (!$user->hasRole('company')) {
+            if ($user->hasRole('company')) {
                 return response()->json([
                     'status' => false,
                     'message' => 'company cannot review companies'
