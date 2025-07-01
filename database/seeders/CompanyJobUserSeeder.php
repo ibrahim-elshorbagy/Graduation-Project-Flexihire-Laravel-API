@@ -6,6 +6,7 @@ use App\Models\JobList;
 use App\Models\User;
 use App\Models\User\JobApply;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Carbon;
@@ -513,7 +514,7 @@ class CompanyJobUserSeeder extends Seeder
 
         $userIds = [];
 
-        foreach ($users as $userData) {
+        foreach ($users as $index => $userData) {
             $user = User::create([
                 'first_name' => $userData['first_name'],
                 'last_name' => $userData['last_name'],
@@ -526,6 +527,12 @@ class CompanyJobUserSeeder extends Seeder
             
             $user->assignRole($userRole);
             $userIds[] = $user->id;
+            
+            // Assign skills to users based on their profile
+            $this->assignSkillsToUser($user, $index);
+            
+            // Assign job titles to users based on their profile
+            $this->assignJobTitlesToUser($user, $index);
             
             $this->command->info("Created user: {$userData['first_name']} {$userData['last_name']}");
         }
@@ -549,5 +556,78 @@ class CompanyJobUserSeeder extends Seeder
         }
 
         $this->command->info('Created job applications (3 per user)');
+    }
+    
+    private function assignSkillsToUser(User $user, int $index)
+    {
+        // Get all available skills from the database
+        $allSkills = DB::table('skills')->get();
+        
+        // Define skill sets based on user profiles
+        $skillSets = [
+            0 => ['PHP', 'Laravel', 'JavaScript', 'MySQL', 'React'], // John Smith - Senior software developer
+            1 => ['UI Design', 'UX Design', 'Figma', 'Adobe XD', 'Sketch', 'Wireframing'], // Emma Johnson - UX/UI designer
+            2 => ['JavaScript', 'React', 'Node.js', 'HTML', 'CSS'], // Michael Williams - Full-stack developer
+            3 => ['Python', 'Machine Learning', 'Data Analysis', 'Data Visualization', 'Pandas'], // Sophia Brown - Data scientist
+            4 => ['Docker', 'AWS', 'Kubernetes', 'CI/CD', 'Terraform'], // David Jones - DevOps engineer
+            5 => ['Java', 'SQL', 'PostgreSQL', 'Database Design', 'Microservice Architect'], // Olivia Miller - Backend developer
+            6 => ['Product Strategy', 'Agile', 'User Stories', 'Market Research', 'Analytics'], // James Davis - Product manager
+            7 => ['JavaScript', 'HTML', 'CSS', 'React', 'Vue.js', 'Angular'], // Ava Wilson - Frontend developer
+            8 => ['Swift', 'Kotlin', 'React Native', 'iOS Development', 'Android SDK'], // William Taylor - Mobile app developer
+            9 => ['Selenium', 'Cypress', 'API Testing', 'Python', 'JavaScript'], // Isabella Anderson - QA engineer
+        ];
+        
+        // Get skills for this specific user
+        $userSkills = $skillSets[$index] ?? ['PHP', 'JavaScript', 'HTML', 'CSS']; // Default skills if index not found
+        
+        // Assign skills to the user
+        foreach ($userSkills as $skillName) {
+            $skill = $allSkills->where('name', $skillName)->first();
+            if ($skill) {
+                DB::table('user_skills')->insert([
+                    'user_id' => $user->id,
+                    'skill_id' => $skill->id,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
+        }
+    }
+    
+    private function assignJobTitlesToUser(User $user, int $index)
+    {
+        // Get all available job titles from the database
+        $allJobTitles = DB::table('our_jobs_title')->get();
+        
+        // Define primary job title based on user profiles
+        $primaryJobTitles = [
+            0 => 'Software Engineer', // John Smith
+            1 => 'UX Designer', // Emma Johnson
+            2 => 'Full Stack Developer', // Michael Williams
+            3 => 'Data Scientist', // Sophia Brown
+            4 => 'DevOps Engineer', // David Jones
+            5 => 'Backend Developer', // Olivia Miller
+            6 => 'Product Manager', // James Davis - Product manager (with technical background)
+            7 => 'Frontend Developer', // Ava Wilson
+            8 => 'Mobile Developer', // William Taylor
+            9 => 'Quality Assurance Engineer', // Isabella Anderson
+        ];
+        
+        // Get job title for this specific user
+        $jobTitleName = $primaryJobTitles[$index] ?? 'Web Developer'; // Default job title if index not found
+        
+        // Assign one job title to the user
+        $jobTitle = $allJobTitles->where('name', $jobTitleName)->first();
+        if ($jobTitle) {
+            DB::table('user_job_title')->insert([
+                'user_id' => $user->id,
+                'our_jobs_title_id' => $jobTitle->id,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+            $this->command->info("  - Assigned job title: {$jobTitleName}");
+        } else {
+            $this->command->info("  - Warning: Job title '{$jobTitleName}' not found in database");
+        }
     }
 }

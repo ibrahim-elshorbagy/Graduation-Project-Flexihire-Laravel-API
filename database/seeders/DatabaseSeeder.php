@@ -28,21 +28,21 @@ class DatabaseSeeder extends Seeder
             'first_name' => 'Admin',
             'last_name' => 'ibrahim',
             'email' => 'a@a.a',
-            'password' => Hash::make('a'),
+            'password' => Hash::make('asdasdasd'),
         ])->assignRole($adminRole);
 
         User::factory()->create([
             'first_name' => 'User',
             'last_name' => 'ahmed',
             'email' => 'u@u.u',
-            'password' => Hash::make('u'),
+            'password' => Hash::make('asdasdasd'),
         ])->assignRole($userRole);
 
         User::factory()->create([
             'first_name' => 'Company',
             'last_name' => 'Mohmed',
             'email' => 'c@c.c',
-            'password' => Hash::make('c'),
+            'password' => Hash::make('asdasdasd'),
         ])->assignRole($companyRole);
         
         // Call the comprehensive seeder to create companies, jobs, and users
