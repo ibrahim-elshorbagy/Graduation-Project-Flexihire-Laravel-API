@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Company;
 
 use App\Http\Controllers\Controller;
 use App\Models\JobList;
+use App\Models\User\SavedJobList;
 use App\Notifications\NewJobPostNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -352,8 +353,16 @@ class JobListController extends Controller
                 ->whereIn('id', $aiRecommendedIds)
                 ->limit(10)
                 ->get()
-                ->map(function ($job) {
+                ->map(function ($job) use ($user) {
                     $job->ai = true;
+                    // Check if user has saved this job
+                    if ($user) {
+                        $job->is_saved = \App\Models\User\SavedJobList::where('user_id', $user->id)
+                            ->where('job_id', $job->id)
+                            ->exists();
+                    } else {
+                        $job->is_saved = false;
+                    }
                     return $job;
                 });
 
@@ -371,7 +380,18 @@ class JobListController extends Controller
                         }
                     })
                     ->limit(10)
-                    ->get();
+                    ->get()
+                    ->map(function ($job) use ($user) {
+                        // Check if user has saved this job
+                        if ($user) {
+                            $job->is_saved = \App\Models\User\SavedJobList::where('user_id', $user->id)
+                                ->where('job_id', $job->id)
+                                ->exists();
+                        } else {
+                            $job->is_saved = false;
+                        }
+                        return $job;
+                    });
 
                 return response()->json([
                     'message' => 'Similar skill jobs retrieved successfully',
@@ -382,7 +402,18 @@ class JobListController extends Controller
                 $recentJobs = JobList::with('user')
                     ->orderBy('date_posted', 'desc')
                     ->limit(10)
-                    ->get();
+                    ->get()
+                    ->map(function ($job) use ($user) {
+                        // Check if user has saved this job
+                        if ($user) {
+                            $job->is_saved = \App\Models\User\SavedJobList::where('user_id', $user->id)
+                                ->where('job_id', $job->id)
+                                ->exists();
+                        } else {
+                            $job->is_saved = false;
+                        }
+                        return $job;
+                    });
 
                 return response()->json([
                     'message' => 'Recent jobs retrieved successfully',
