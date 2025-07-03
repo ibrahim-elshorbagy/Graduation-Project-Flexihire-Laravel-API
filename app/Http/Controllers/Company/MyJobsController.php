@@ -256,16 +256,8 @@ class MyJobsController extends Controller
                 $rankedApplications = $applications;
             }
 
-            // Paginate the results
-            $page = $request->get('page', 1);
-            $perPage = 10;
-            $total = $rankedApplications->count();
-            $offset = ($page - 1) * $perPage;
-            
-            $paginatedApplications = $rankedApplications->slice($offset, $perPage)->values();
-
             // Add similarity scores and ai flag to each user
-            $paginatedApplications->each(function($application) use ($aiSimilarityData) {
+            $rankedApplications->each(function($application) use ($aiSimilarityData) {
                 if ($application->user) {
                     $userId = $application->user->id;
                     $application->user->similarity = isset($aiSimilarityData[$userId]) ? $aiSimilarityData[$userId] : null;
@@ -273,26 +265,51 @@ class MyJobsController extends Controller
                 }
             });
 
-            // Format response similar to myJobProposals
-            $response = [
-                'current_page' => (int)$page,
-                'data' => $paginatedApplications,
-                'first_page_url' => request()->url() . '?page=1',
-                'from' => $offset + 1,
-                'last_page' => ceil($total / $perPage),
-                'last_page_url' => request()->url() . '?page=' . ceil($total / $perPage),
-                'next_page_url' => $page < ceil($total / $perPage) ? request()->url() . '?page=' . ($page + 1) : null,
-                'path' => request()->url(),
-                'per_page' => $perPage,
-                'prev_page_url' => $page > 1 ? request()->url() . '?page=' . ($page - 1) : null,
-                'to' => min($offset + $perPage, $total),
-                'total' => $total
-            ];
+            // Use Laravel's built-in pagination like myJobProposals
+            $proposals = $job->applies()
+                ->with('user')
+                ->whereHas('user', function($query) {
+                    $query->whereNotNull('cv');
+                })
+                ->get()
+                ->sortBy(function($application) use ($rankingMap) {
+                    if (!empty($rankingMap)) {
+                        $userId = $application->user->id;
+                        return isset($rankingMap[$userId]) ? $rankingMap[$userId] : 9999;
+                    }
+                    return 0;
+                });
+
+            // Add similarity scores and ai flag
+            $proposals->each(function($application) use ($aiSimilarityData) {
+                if ($application->user) {
+                    $userId = $application->user->id;
+                    $application->user->similarity = isset($aiSimilarityData[$userId]) ? $aiSimilarityData[$userId] : null;
+                    $application->user->ai = true;
+                }
+            });
+
+            // Paginate using Laravel's paginate method
+            $page = $request->get('page', 1);
+            $perPage = 10;
+            $total = $proposals->count();
+            $offset = ($page - 1) * $perPage;
+            
+            $paginatedProposals = $proposals->slice($offset, $perPage)->values();
+            
+            // Create paginator instance
+            $paginator = new \Illuminate\Pagination\LengthAwarePaginator(
+                $paginatedProposals,
+                $total,
+                $perPage,
+                $page,
+                ['path' => request()->url(), 'pageName' => 'page']
+            );
 
             return response()->json([
                 'status' => true,
                 'message' => 'Job proposals ranked successfully',
-                'data' => $response,
+                'data' => $paginator,
                 'ai_ranking_applied' => !empty($rankedUserIds)
             ]);
 
