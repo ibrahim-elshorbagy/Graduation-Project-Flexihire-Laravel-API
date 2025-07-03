@@ -318,8 +318,10 @@ class JobListController extends Controller
 
         // Get user's skills if available
         if ($user) {
+
+
             $userSkills = $user->skills()->pluck('name')->toArray();
-            $userSkillsString = implode(',', $userSkills);            if (!empty($userSkillsString)) {
+            $userSkillsString = implode(',', $userSkills);            
                 try {
                     // Get AI endpoint URL from config
                     $aiEndpoint = config('ai.recommendation_url');
@@ -329,9 +331,11 @@ class JobListController extends Controller
                         Log::info("Using AI Recommendation URL: " . $aiEndpoint);
 
                         // Make the API call only if we have a valid URL
-                        $aiResponse = Http::timeout(3)->post($aiEndpoint, [
-                            'skills' => $user->description
+                        $aiResponse = Http::timeout(30000)->post($aiEndpoint, [
+                            'skills' => $user->description,
+                            'top_k'=>10
                         ]);
+                        Log::info("AI Recommendation API response: " . $aiResponse->body());
 
                         // Check if the API call was successful
                         if ($aiResponse->successful()) {
@@ -344,10 +348,10 @@ class JobListController extends Controller
                     Log::info("error calling AI recommendation API: " . $e->getMessage());
                     // Continue without AI recommendations if API fails
                 }
-            }
         }
+        
 
-        // If we have AI recommendations, return only the first 5 jobs
+        // If we have AI recommendations, return only the first 10 jobs
         if (!empty($aiRecommendedIds)) {
             $aiJobs = JobList::with('user')
                 ->whereIn('id', $aiRecommendedIds)
@@ -371,7 +375,7 @@ class JobListController extends Controller
                 'data' => $aiJobs,
             ]);
         } else {
-            // If no AI recommendations, find only 5 jobs with similar skills to the user
+            // If no AI recommendations, find only 10 jobs with similar skills to the user
             if (!empty($userSkills)) {
                 $similarSkillJobs = JobList::with('user')
                     ->where(function ($query) use ($userSkills) {
@@ -398,7 +402,7 @@ class JobListController extends Controller
                     'data' => $similarSkillJobs,
                 ]);
             } else {
-                // If user has no skills, return only 5 recent jobs
+                // If user has no skills, return only 10 recent jobs
                 $recentJobs = JobList::with('user')
                     ->orderBy('date_posted', 'desc')
                     ->limit(10)

@@ -105,9 +105,9 @@ class CompanyJobUserSeeder extends Seeder
             $this->command->info("Created company: {$companyData['name']}");
         }
 
-        // Create 2 jobs per company (20 jobs total)
+        // Create 20 unique jobs (2 per company)
         $jobDescriptions = [
-            // Frontend Development Jobs
+            // Job 1: Senior Frontend Developer
             [
                 'title' => 'Senior Frontend Developer',
                 'description' => '<h2>About This Role</h2>
@@ -130,11 +130,42 @@ class CompanyJobUserSeeder extends Seeder
   <li>Understanding of responsive design principles</li>
   <li>Knowledge of modern frontend build pipelines and tools</li>
 </ul>',
-                'skills' => ['React', 'JavaScript', 'HTML5', 'CSS3', 'Responsive Design'],
+                'skills' => ['React', 'JavaScript', 'HTML', 'CSS', 'Webpack'],
                 'min_salary' => 80000,
                 'max_salary' => 120000,
                 'payment_period' => 'yearly',
             ],
+            
+            // Job 2: Junior React Developer
+            [
+                'title' => 'Junior React Developer',
+                'description' => '<h2>About This Role</h2>
+<p>We are seeking a motivated Junior React Developer to join our growing team. This is an excellent opportunity for someone starting their career in frontend development.</p>
+
+<h3>Key Responsibilities:</h3>
+<ul>
+  <li>Develop user interface components using React.js</li>
+  <li>Implement responsive designs with modern CSS frameworks</li>
+  <li>Participate in code reviews and follow best practices</li>
+  <li>Collaborate with senior developers to learn and grow</li>
+  <li>Write clean, maintainable code</li>
+</ul>
+
+<h3>Requirements:</h3>
+<ul>
+  <li>1-2 years of experience with React.js</li>
+  <li>Basic knowledge of JavaScript, HTML5, CSS3</li>
+  <li>Familiarity with Git version control</li>
+  <li>Understanding of responsive web design</li>
+  <li>Eagerness to learn and grow in a team environment</li>
+</ul>',
+                'skills' => ['React', 'JavaScript', 'HTML', 'CSS', 'Git'],
+                'min_salary' => 45000,
+                'max_salary' => 65000,
+                'payment_period' => 'yearly',
+            ],
+            
+            // Job 3: UI/UX Designer
             [
                 'title' => 'UI/UX Designer',
                 'description' => '<h2>About This Role</h2>
@@ -163,7 +194,36 @@ class CompanyJobUserSeeder extends Seeder
                 'payment_period' => 'yearly',
             ],
             
-            // Backend Development Jobs
+            // Job 4: Junior UX/UI Designer
+            [
+                'title' => 'Junior UX/UI Designer',
+                'description' => '<h2>About This Role</h2>
+<p>Join our design team as a Junior UX/UI Designer! This role is perfect for a creative individual looking to start their career in digital design and user experience.</p>
+
+<h3>Key Responsibilities:</h3>
+<ul>
+  <li>Assist in creating wireframes and prototypes</li>
+  <li>Support user research and usability testing</li>
+  <li>Create visual designs under senior designer guidance</li>
+  <li>Help maintain design systems and style guides</li>
+  <li>Collaborate with development team on design implementation</li>
+</ul>
+
+<h3>Requirements:</h3>
+<ul>
+  <li>0-2 years of experience in UI/UX design</li>
+  <li>Basic knowledge of Figma or Adobe XD</li>
+  <li>Understanding of design principles and typography</li>
+  <li>Portfolio showcasing design projects or personal work</li>
+  <li>Strong communication and collaboration skills</li>
+</ul>',
+                'skills' => ['UI Design', 'UX Design', 'Figma', 'Prototyping', 'User Research'],
+                'min_salary' => 40000,
+                'max_salary' => 60000,
+                'payment_period' => 'yearly',
+            ],
+            
+            // Job 5: Senior Backend Engineer
             [
                 'title' => 'Senior Backend Engineer',
                 'description' => '<h2>About This Role</h2>
@@ -186,11 +246,42 @@ class CompanyJobUserSeeder extends Seeder
   <li>Knowledge of cloud services (AWS, Azure, or GCP)</li>
   <li>Understanding of server-side templating languages</li>
 </ul>',
-                'skills' => ['Node.js', 'Python', 'AWS', 'SQL', 'RESTful APIs'],
+                'skills' => ['Node.js', 'Python', 'AWS', 'MySQL', 'PostgreSQL'],
                 'min_salary' => 90000,
                 'max_salary' => 140000,
                 'payment_period' => 'yearly',
             ],
+            
+            // Job 6: Junior PHP Developer
+            [
+                'title' => 'Junior PHP Developer',
+                'description' => '<h2>About This Role</h2>
+<p>We are looking for an enthusiastic Junior PHP Developer to join our backend team. This position offers great learning opportunities and growth potential.</p>
+
+<h3>Key Responsibilities:</h3>
+<ul>
+  <li>Develop web applications using PHP and Laravel framework</li>
+  <li>Write clean, well-documented code</li>
+  <li>Participate in code reviews and testing</li>
+  <li>Work with databases to store and retrieve data</li>
+  <li>Debug and troubleshoot application issues</li>
+</ul>
+
+<h3>Requirements:</h3>
+<ul>
+  <li>1-2 years of experience with PHP</li>
+  <li>Basic knowledge of Laravel framework</li>
+  <li>Understanding of MySQL databases</li>
+  <li>Familiarity with HTML, CSS, and JavaScript</li>
+  <li>Strong problem-solving skills and attention to detail</li>
+</ul>',
+                'skills' => ['PHP', 'Laravel', 'MySQL', 'HTML', 'CSS'],
+                'min_salary' => 42000,
+                'max_salary' => 62000,
+                'payment_period' => 'yearly',
+            ],
+            
+            // Job 7: Database Administrator
             [
                 'title' => 'Database Administrator',
                 'description' => '<h2>About This Role</h2>
@@ -213,13 +304,42 @@ class CompanyJobUserSeeder extends Seeder
   <li>Knowledge of data backup, recovery, and security processes</li>
   <li>Understanding of GDPR and data privacy practices</li>
 </ul>',
-                'skills' => ['SQL', 'MySQL', 'PostgreSQL', 'Database Design', 'Data Security'],
+                'skills' => ['SQL', 'MySQL', 'PostgreSQL', 'Database Design', 'Oracle'],
                 'min_salary' => 85000,
                 'max_salary' => 130000,
                 'payment_period' => 'yearly',
             ],
             
-            // DevOps Jobs
+            // Job 8: Junior Database Developer
+            [
+                'title' => 'Junior Database Developer',
+                'description' => '<h2>About This Role</h2>
+<p>Join our data team as a Junior Database Developer! This role offers hands-on experience with database design, development, and optimization.</p>
+
+<h3>Key Responsibilities:</h3>
+<ul>
+  <li>Assist in database design and schema development</li>
+  <li>Write and optimize SQL queries</li>
+  <li>Support data migration and integration projects</li>
+  <li>Help maintain database documentation</li>
+  <li>Learn database performance tuning techniques</li>
+</ul>
+
+<h3>Requirements:</h3>
+<ul>
+  <li>1-2 years of experience with SQL</li>
+  <li>Basic knowledge of MySQL or PostgreSQL</li>
+  <li>Understanding of database normalization</li>
+  <li>Familiarity with data modeling concepts</li>
+  <li>Strong analytical and problem-solving skills</li>
+</ul>',
+                'skills' => ['SQL', 'MySQL', 'PostgreSQL', 'Database Design', 'Data Analysis'],
+                'min_salary' => 48000,
+                'max_salary' => 68000,
+                'payment_period' => 'yearly',
+            ],
+            
+            // Job 9: DevOps Engineer
             [
                 'title' => 'DevOps Engineer',
                 'description' => '<h2>About This Role</h2>
@@ -242,11 +362,42 @@ class CompanyJobUserSeeder extends Seeder
   <li>Familiarity with cloud platforms (AWS, Azure, GCP)</li>
   <li>Understanding of networking and security principles</li>
 </ul>',
-                'skills' => ['Docker', 'Kubernetes', 'CI/CD', 'Terraform', 'AWS'],
+                'skills' => ['Docker', 'Kubernetes', 'AWS', 'Terraform', 'GitHub Actions'],
                 'min_salary' => 85000,
                 'max_salary' => 130000,
                 'payment_period' => 'yearly',
             ],
+            
+            // Job 10: Junior DevOps Engineer
+            [
+                'title' => 'Junior DevOps Engineer',
+                'description' => '<h2>About This Role</h2>
+<p>Start your DevOps career with us! This junior position offers excellent learning opportunities in cloud infrastructure, automation, and deployment processes.</p>
+
+<h3>Key Responsibilities:</h3>
+<ul>
+  <li>Assist in maintaining CI/CD pipelines</li>
+  <li>Help monitor system performance and logs</li>
+  <li>Support cloud infrastructure management</li>
+  <li>Learn automation tools and scripting</li>
+  <li>Participate in incident response and troubleshooting</li>
+</ul>
+
+<h3>Requirements:</h3>
+<ul>
+  <li>0-2 years of experience in DevOps or IT operations</li>
+  <li>Basic knowledge of Linux systems</li>
+  <li>Familiarity with Docker and containerization</li>
+  <li>Understanding of Git version control</li>
+  <li>Eagerness to learn cloud platforms (AWS, Azure, or GCP)</li>
+</ul>',
+                'skills' => ['Docker', 'Git', 'AWS', 'Apache', 'Nginx'],
+                'min_salary' => 50000,
+                'max_salary' => 70000,
+                'payment_period' => 'yearly',
+            ],
+            
+            // Job 11: Site Reliability Engineer
             [
                 'title' => 'Site Reliability Engineer',
                 'description' => '<h2>About This Role</h2>
@@ -269,13 +420,13 @@ class CompanyJobUserSeeder extends Seeder
   <li>Knowledge of monitoring systems and observability practices</li>
   <li>Understanding of network protocols and security</li>
 </ul>',
-                'skills' => ['Linux', 'Python', 'Monitoring', 'Cloud Infrastructure', 'Incident Response'],
+                'skills' => ['Python', 'Kubernetes', 'Prometheus', 'AWS', 'Incident Response'],
                 'min_salary' => 90000,
                 'max_salary' => 140000,
                 'payment_period' => 'yearly',
             ],
             
-            // Data Science Jobs
+            // Job 12: Data Scientist
             [
                 'title' => 'Data Scientist',
                 'description' => '<h2>About This Role</h2>
@@ -298,11 +449,13 @@ class CompanyJobUserSeeder extends Seeder
   <li>Knowledge of machine learning techniques</li>
   <li>Strong mathematical and statistical skills</li>
 </ul>',
-                'skills' => ['Python', 'Machine Learning', 'Statistics', 'Data Visualization', 'SQL'],
+                'skills' => ['Python', 'Machine Learning', 'Pandas', 'Data Visualization', 'R Programming'],
                 'min_salary' => 90000,
                 'max_salary' => 140000,
                 'payment_period' => 'yearly',
             ],
+            
+            // Job 13: Machine Learning Engineer
             [
                 'title' => 'Machine Learning Engineer',
                 'description' => '<h2>About This Role</h2>
@@ -325,13 +478,13 @@ class CompanyJobUserSeeder extends Seeder
   <li>Knowledge of data structures, data modeling, and software architecture</li>
   <li>Understanding of distributed computing</li>
 </ul>',
-                'skills' => ['Python', 'TensorFlow', 'PyTorch', 'Machine Learning', 'Distributed Computing'],
+                'skills' => ['Python', 'TensorFlow', 'PyTorch', 'Machine Learning', 'Big Data'],
                 'min_salary' => 100000,
                 'max_salary' => 150000,
                 'payment_period' => 'yearly',
             ],
             
-            // Product Management Jobs
+            // Job 14: Product Manager
             [
                 'title' => 'Product Manager',
                 'description' => '<h2>About This Role</h2>
@@ -359,46 +512,191 @@ class CompanyJobUserSeeder extends Seeder
                 'max_salary' => 140000,
                 'payment_period' => 'yearly',
             ],
+            
+            // Job 15: Mobile App Developer
             [
-                'title' => 'Technical Project Manager',
+                'title' => 'Mobile App Developer',
                 'description' => '<h2>About This Role</h2>
-<p>We are seeking a Technical Project Manager to lead our development projects. You will be responsible for planning, executing, and closing projects according to strict deadlines and within budget.</p>
+<p>Join our mobile team as a Mobile App Developer! You will be responsible for creating high-quality mobile applications for iOS and Android platforms.</p>
 
 <h3>Key Responsibilities:</h3>
 <ul>
-  <li>Plan and manage the full project lifecycle</li>
-  <li>Define project scope, goals, and deliverables</li>
-  <li>Coordinate internal resources and third parties/vendors</li>
-  <li>Manage project budget and resource allocation</li>
-  <li>Communicate project status to stakeholders</li>
+  <li>Develop native and cross-platform mobile applications</li>
+  <li>Collaborate with designers to implement intuitive user interfaces</li>
+  <li>Integrate mobile apps with backend services and APIs</li>
+  <li>Optimize applications for performance and user experience</li>
+  <li>Test and debug mobile applications across different devices</li>
 </ul>
 
 <h3>Requirements:</h3>
 <ul>
-  <li>4+ years of experience in technical project management</li>
-  <li>PMP or other project management certification</li>
-  <li>Understanding of software development processes</li>
-  <li>Strong leadership and communication skills</li>
-  <li>Experience with project management tools</li>
+  <li>3+ years of experience in mobile app development</li>
+  <li>Proficiency in Swift, Kotlin, or React Native</li>
+  <li>Experience with mobile app architecture and design patterns</li>
+  <li>Knowledge of RESTful APIs and third-party integrations</li>
+  <li>Understanding of mobile app store guidelines and deployment</li>
 </ul>',
-                'skills' => ['Project Management', 'Agile', 'Scrum', 'Budgeting', 'Risk Management'],
+                'skills' => ['Swift', 'Kotlin', 'React Native', 'iOS Development', 'Android SDK'],
+                'min_salary' => 80000,
+                'max_salary' => 125000,
+                'payment_period' => 'yearly',
+            ],
+            
+            // Job 16: Cybersecurity Analyst
+            [
+                'title' => 'Cybersecurity Analyst',
+                'description' => '<h2>About This Role</h2>
+<p>We are seeking a Cybersecurity Analyst to protect our organization\'s digital assets. You will monitor, detect, and respond to security threats and vulnerabilities.</p>
+
+<h3>Key Responsibilities:</h3>
+<ul>
+  <li>Monitor security events and analyze potential threats</li>
+  <li>Conduct vulnerability assessments and penetration testing</li>
+  <li>Implement and maintain security tools and policies</li>
+  <li>Respond to security incidents and breaches</li>
+  <li>Create security reports and recommendations</li>
+</ul>
+
+<h3>Requirements:</h3>
+<ul>
+  <li>3+ years of experience in cybersecurity</li>
+  <li>Knowledge of security frameworks and compliance standards</li>
+  <li>Experience with security tools and technologies</li>
+  <li>Understanding of network security and cryptography</li>
+  <li>Strong analytical and problem-solving skills</li>
+</ul>',
+                'skills' => ['Network Security', 'Penetration Testing', 'Cryptography', 'Security Auditing', 'Incident Response'],
+                'min_salary' => 75000,
+                'max_salary' => 115000,
+                'payment_period' => 'yearly',
+            ],
+            
+            // Job 17: QA Engineer
+            [
+                'title' => 'QA Engineer',
+                'description' => '<h2>About This Role</h2>
+<p>We are looking for a Quality Assurance Engineer to ensure the quality and reliability of our software products through comprehensive testing strategies.</p>
+
+<h3>Key Responsibilities:</h3>
+<ul>
+  <li>Design and execute test plans and test cases</li>
+  <li>Perform manual and automated testing</li>
+  <li>Identify, document, and track software defects</li>
+  <li>Collaborate with development teams to resolve issues</li>
+  <li>Continuously improve testing processes and methodologies</li>
+</ul>
+
+<h3>Requirements:</h3>
+<ul>
+  <li>3+ years of experience in software testing</li>
+  <li>Knowledge of testing methodologies and tools</li>
+  <li>Experience with automated testing frameworks</li>
+  <li>Understanding of SDLC and agile methodologies</li>
+  <li>Strong attention to detail and analytical skills</li>
+</ul>',
+                'skills' => ['Git', 'JavaScript', 'Python', 'Agile', 'Test Automation'],
+                'min_salary' => 65000,
+                'max_salary' => 95000,
+                'payment_period' => 'yearly',
+            ],
+            
+            // Job 18: Full Stack Developer
+            [
+                'title' => 'Full Stack Developer',
+                'description' => '<h2>About This Role</h2>
+<p>We are seeking a versatile Full Stack Developer to work on both frontend and backend technologies. You will be involved in the complete software development lifecycle.</p>
+
+<h3>Key Responsibilities:</h3>
+<ul>
+  <li>Develop web applications using modern frontend and backend technologies</li>
+  <li>Design and implement RESTful APIs</li>
+  <li>Work with databases and optimize queries</li>
+  <li>Collaborate with cross-functional teams</li>
+  <li>Participate in code reviews and maintain code quality</li>
+</ul>
+
+<h3>Requirements:</h3>
+<ul>
+  <li>4+ years of experience in full stack development</li>
+  <li>Proficiency in JavaScript, React, and Node.js</li>
+  <li>Experience with database technologies (SQL and NoSQL)</li>
+  <li>Knowledge of version control systems and deployment processes</li>
+  <li>Understanding of web security and performance optimization</li>
+</ul>',
+                'skills' => ['JavaScript', 'React', 'Node.js', 'MongoDB', 'Express.js'],
                 'min_salary' => 85000,
                 'max_salary' => 130000,
+                'payment_period' => 'yearly',
+            ],
+            
+            // Job 19: Cloud Solutions Architect
+            [
+                'title' => 'Cloud Solutions Architect',
+                'description' => '<h2>About This Role</h2>
+<p>We are looking for a Cloud Solutions Architect to design and implement scalable cloud infrastructure solutions. You will lead cloud adoption initiatives and ensure best practices.</p>
+
+<h3>Key Responsibilities:</h3>
+<ul>
+  <li>Design cloud architecture solutions for business requirements</li>
+  <li>Lead cloud migration and modernization projects</li>
+  <li>Establish cloud governance and security standards</li>
+  <li>Optimize cloud costs and performance</li>
+  <li>Mentor teams on cloud technologies and best practices</li>
+</ul>
+
+<h3>Requirements:</h3>
+<ul>
+  <li>5+ years of experience in cloud architecture</li>
+  <li>Expertise in AWS, Azure, or Google Cloud Platform</li>
+  <li>Knowledge of infrastructure as code and automation tools</li>
+  <li>Experience with containerization and microservices</li>
+  <li>Strong leadership and communication skills</li>
+</ul>',
+                'skills' => ['AWS', 'Azure', 'Google Cloud', 'Terraform', 'Kubernetes'],
+                'min_salary' => 120000,
+                'max_salary' => 180000,
+                'payment_period' => 'yearly',
+            ],
+            
+            // Job 20: Technical Writer
+            [
+                'title' => 'Technical Writer',
+                'description' => '<h2>About This Role</h2>
+<p>We are seeking a Technical Writer to create clear, comprehensive documentation for our software products and APIs. You will work closely with development teams to translate complex technical concepts into user-friendly content.</p>
+
+<h3>Key Responsibilities:</h3>
+<ul>
+  <li>Create and maintain technical documentation, user guides, and API documentation</li>
+  <li>Collaborate with developers and product managers to understand features</li>
+  <li>Develop tutorials, code examples, and best practice guides</li>
+  <li>Review and edit content for clarity, accuracy, and consistency</li>
+  <li>Maintain documentation websites and knowledge bases</li>
+</ul>
+
+<h3>Requirements:</h3>
+<ul>
+  <li>2+ years of experience in technical writing</li>
+  <li>Strong writing and communication skills</li>
+  <li>Basic understanding of software development concepts</li>
+  <li>Experience with documentation tools and platforms</li>
+  <li>Ability to learn new technologies quickly</li>
+</ul>',
+                'skills' => ['Technical Writing', 'Git', 'Markdown', 'API Documentation', 'Content Management'],
+                'min_salary' => 60000,
+                'max_salary' => 85000,
                 'payment_period' => 'yearly',
             ],
         ];
 
         $currentDate = Carbon::now();
         
-        // Create a copy of job descriptions to prevent depletion
-        $availableJobs = $jobDescriptions;
+        // Assign exactly 2 unique jobs to each company
+        $jobIndex = 0;
         
         foreach ($companyIds as $companyId) {
-            // Select two random job descriptions for each company
-            $randomJobKeys = array_rand($availableJobs, 2);
-            
-            foreach ((array)$randomJobKeys as $jobKey) {
-                $jobData = $availableJobs[$jobKey];
+            // Each company gets exactly 2 consecutive jobs from the array
+            for ($i = 0; $i < 2; $i++) {
+                $jobData = $jobDescriptions[$jobIndex];
                 
                 // Create the job
                 JobList::create([
@@ -416,17 +714,13 @@ class CompanyJobUserSeeder extends Seeder
                     'hiring_multiple_candidates' => (bool)rand(0, 1),
                 ]);
                 
-                // Remove this job from the temporary array so it's not used again for this company
-                unset($availableJobs[$jobKey]);
-            }
-            
-            // Reset available jobs for next company if we're running low
-            if (count($availableJobs) < 2) {
-                $availableJobs = $jobDescriptions;
+                $this->command->info("Created job: {$jobData['title']} for company ID: {$companyId}");
+                
+                $jobIndex++;
             }
         }
 
-        $this->command->info('Created 20 jobs (2 per company)');
+        $this->command->info('Created 20 unique jobs (2 per company, no duplicates)');
 
         // Create 10 users
         $users = [
