@@ -331,15 +331,21 @@ class JobListController extends Controller
                         Log::info("Using AI Recommendation URL: " . $aiEndpoint);
 
                         // Make the API call only if we have a valid URL
+                        Log::info("description: " . $user->description);
+
                         $aiResponse = Http::timeout(30000)->post($aiEndpoint, [
                             'skills' => $user->description,
                             'top_k'=>10
                         ]);
+
                         Log::info("AI Recommendation API response: " . $aiResponse->body());
 
                         // Check if the API call was successful
                         if ($aiResponse->successful()) {
                             $aiRecommendedIds = collect($aiResponse->json())->pluck('id')->toArray();
+                            Log::info("aiRecommendedIds");
+                            Log::info($aiRecommendedIds);
+
                         }
                     } else {
                         Log::info("No AI recommendation URL available, skipping API call");
@@ -355,21 +361,29 @@ class JobListController extends Controller
         if (!empty($aiRecommendedIds)) {
             $aiJobs = JobList::with('user')
                 ->whereIn('id', $aiRecommendedIds)
-                ->limit(10)
+                // Preserve the order of recommended jobs based on their scores
                 ->get()
+                ->sortBy(function($job) use ($aiRecommendedIds) {
+                    // Find the position of this job's ID in the aiRecommendedIds array
+                    return array_search($job->id, $aiRecommendedIds);
+                })
+                ->take(10)
                 ->map(function ($job) use ($user) {
                     $job->ai = true;
                     // Check if user has saved this job
                     if ($user) {
-                        $job->is_saved = \App\Models\User\SavedJobList::where('user_id', $user->id)
+                        $job->is_saved = SavedJobList::where('user_id', $user->id)
                             ->where('job_id', $job->id)
                             ->exists();
                     } else {
                         $job->is_saved = false;
                     }
                     return $job;
-                });
-
+                })
+                ->values(); // Reset array keys after sorting
+                
+            Log::info("AI jobs found: " . $aiJobs->count());
+            
             return response()->json([
                 'message' => 'AI recommended jobs retrieved successfully',
                 'data' => $aiJobs,
