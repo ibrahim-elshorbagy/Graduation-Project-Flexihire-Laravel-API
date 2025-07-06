@@ -405,10 +405,12 @@ class UserController extends Controller
             ->paginate($perPage);
 
         // Add saved status to each job
-        $jobs->getCollection()->transform(function($job) use ($savedJobIds) {
-            $job->saved = in_array($job->id, $savedJobIds);
-            return $job;
-        });
+      $jobs->getCollection()->transform(function($job) use ($savedJobIds) {
+          $isSaved = in_array($job->id, $savedJobIds);
+          $job->saved = $isSaved;
+          $job->is_saved = $isSaved;
+          return $job;
+      });
 
         return response()->json([
             'message' => 'Jobs retrieved successfully.',
