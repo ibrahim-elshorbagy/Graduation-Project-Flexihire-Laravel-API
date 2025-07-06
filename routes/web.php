@@ -15,7 +15,7 @@ Route::middleware(['auth', 'verified','role:admin'])->get('admin/dashboard', Das
 
 Route::middleware(['auth'])->get('admin/profile', function () {
     return view('profile');
-})->name('admin.profile');
+})->name('profile');
 
 // Admin Routes
 Route::middleware(['auth', 'verified','role:admin'])->prefix('admin')->name('admin.')->group(function () {
