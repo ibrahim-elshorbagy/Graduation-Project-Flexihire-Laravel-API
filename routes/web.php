@@ -10,13 +10,12 @@ use Illuminate\Support\Facades\Route;
 
 use App\Livewire\Pages\Admin\ContactUs\ContactUsList;
 
-Route::redirect('/', 'dashboard');
 
-Route::middleware(['auth', 'verified','role:admin'])->get('dashboard', Dashboard::class)->name('dashboard');
+Route::middleware(['auth', 'verified','role:admin'])->get('admin/dashboard', Dashboard::class)->name('dashboard');
 
-Route::view('profile', 'profile')
-    ->middleware(['auth'])
-    ->name('profile');
+Route::middleware(['auth'])->get('admin/profile', function () {
+    return view('profile');
+})->name('admin.profile');
 
 // Admin Routes
 Route::middleware(['auth', 'verified','role:admin'])->prefix('admin')->name('admin.')->group(function () {
@@ -32,7 +31,7 @@ Route::middleware(['auth', 'verified','role:admin'])->prefix('admin')->name('adm
     Route::get('/reports', ReportsList::class)->name('reports');
     Route::get('/reports/{id}', ReportShow::class)->name('reports.show');
 
-    Route::get('/admin/contact-messages', ContactUsList::class)->name('contact-messages');
+    Route::get('/contact-messages', ContactUsList::class)->name('contact-messages');
 
 });
 
