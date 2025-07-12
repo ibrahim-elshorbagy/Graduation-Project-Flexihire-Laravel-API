@@ -45,6 +45,9 @@ Route::middleware(['guest','api'])->group(function () {
     //get Icons + Jobs
     Route::get('/get-skills-jobs',[AuthenticatedSessionController::class, 'getSkillsAndJobs']);
 
+    // Show Review
+    Route::get('reviews/show/{id}', [ReviewController::class, 'show'])->middleware('guest');
+
 });
 
 //------------------------------ Profile -----------------------------------------//

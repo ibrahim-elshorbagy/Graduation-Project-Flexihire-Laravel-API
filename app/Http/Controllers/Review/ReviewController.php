@@ -174,4 +174,40 @@ class ReviewController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Get a specific review by ID
+     */
+    public function show($id)
+    {
+        try {
+            $validator = Validator::make(['id' => $id], [
+                'id' => 'required|exists:reviews,id',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Invalid review ID',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            $review = Review::with(['user', 'company'])
+                ->findOrFail($id);
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Review retrieved successfully',
+                'data' => $review
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'An error occurred while retrieving the review',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
 }
